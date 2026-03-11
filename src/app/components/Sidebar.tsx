@@ -37,12 +37,11 @@ export default function Sidebar() {
       className="
         group fixed left-0 top-0 z-50 h-screen
         w-[88px] hover:w-[244px]
-        transition-[width] duration-500 ease-[cubic-bezier(0.22,1,0.36,1)]
-        will-change-[width]
+        transition-[width] duration-300 ease-out
       "
       aria-label="Sidebar navigation"
     >
-      <div className="relative h-full overflow-hidden border-r border-fuchsia-400/10 bg-[#07101f]/80 backdrop-blur-2xl">
+      <div className="relative h-full overflow-hidden border-r border-fuchsia-400/10 bg-[#07101f]/88 backdrop-blur-2xl shadow-[10px_0_40px_rgba(0,0,0,0.28)]">
         {/* layered background */}
         <div className="absolute inset-0 bg-[radial-gradient(circle_at_top_left,rgba(217,70,239,0.22),transparent_30%),radial-gradient(circle_at_bottom_left,rgba(34,211,238,0.16),transparent_28%),radial-gradient(circle_at_bottom_center,rgba(56,189,248,0.08),transparent_25%),linear-gradient(180deg,rgba(255,255,255,0.05),rgba(255,255,255,0.02))]" />
 
@@ -59,31 +58,17 @@ export default function Sidebar() {
         <div className="relative flex h-full flex-col">
           {/* top logo block */}
           <div className="px-3 pb-3 pt-4">
-            <div
-              className="
-                flex items-center gap-3 rounded-[26px]
-                border border-white/10 bg-white/[0.06]
-                p-3 backdrop-blur-xl
-                shadow-[inset_0_1px_0_rgba(255,255,255,0.08),0_12px_30px_rgba(0,0,0,0.24)]
-              "
-            >
-              <div
-                className="
-                  relative flex h-12 w-12 shrink-0 items-center justify-center
-                  rounded-2xl border border-white/10
-                  bg-gradient-to-br from-fuchsia-500/30 via-violet-500/20 to-cyan-400/25
-                  shadow-[0_0_26px_rgba(168,85,247,0.26)]
-                "
-              >
+            <div className="flex items-center gap-3 rounded-[26px] border border-white/10 bg-white/[0.06] p-3 backdrop-blur-xl shadow-[inset_0_1px_0_rgba(255,255,255,0.08),0_12px_30px_rgba(0,0,0,0.24)]">
+              <div className="relative flex h-12 w-12 shrink-0 items-center justify-center rounded-2xl border border-white/10 bg-gradient-to-br from-fuchsia-500/30 via-violet-500/20 to-cyan-400/25 shadow-[0_0_26px_rgba(168,85,247,0.26)]">
                 <div className="absolute inset-0 rounded-2xl bg-gradient-to-br from-white/10 to-transparent" />
                 <Gamepad2 className="relative h-6 w-6 text-white" />
               </div>
 
               <div className="min-w-0 overflow-hidden">
-                <h2 className="truncate text-[17px] font-semibold tracking-[0.01em] text-white opacity-0 transition-all duration-300 group-hover:opacity-100">
+                <h2 className="truncate text-[17px] font-semibold tracking-[0.01em] text-white opacity-0 transition-all duration-200 group-hover:opacity-100">
                   Ridzhan SASS
                 </h2>
-                <p className="truncate text-xs text-white/60 opacity-0 transition-all duration-300 delay-75 group-hover:opacity-100">
+                <p className="truncate text-xs text-white/60 opacity-0 transition-all duration-200 delay-75 group-hover:opacity-100">
                   Admin Access
                 </p>
               </div>
@@ -102,10 +87,10 @@ export default function Sidebar() {
                   className={({ isActive }) =>
                     [
                       "relative flex h-14 items-center gap-4 overflow-hidden rounded-2xl border px-4",
-                      "transition-all duration-300 ease-out",
+                      "transition-all duration-200 ease-out",
                       isActive
                         ? "border-fuchsia-400/30 bg-gradient-to-r from-fuchsia-500/18 via-violet-500/12 to-cyan-400/16 text-cyan-300 shadow-[0_0_24px_rgba(168,85,247,0.24)]"
-                        : "border-transparent bg-white/[0.02] text-white/70 hover:border-white/10 hover:bg-white/[0.05] hover:text-white hover:shadow-[0_10px_24px_rgba(0,0,0,0.18)]",
+                        : "border-transparent bg-white/[0.02] text-white/70 hover:border-white/10 hover:bg-white/[0.05] hover:text-white",
                     ].join(" ")
                   }
                 >
@@ -121,7 +106,7 @@ export default function Sidebar() {
                       <div className="relative z-10 flex w-6 shrink-0 justify-center">
                         <item.icon
                           className={[
-                            "h-5 w-5 transition-all duration-300",
+                            "h-5 w-5 transition-all duration-200",
                             isActive
                               ? "text-cyan-300 drop-shadow-[0_0_8px_rgba(34,211,238,0.8)]"
                               : "text-white/80",
@@ -129,13 +114,13 @@ export default function Sidebar() {
                         />
                       </div>
 
-                      <span className="relative z-10 whitespace-nowrap text-sm font-medium opacity-0 transition-all duration-300 group-hover:opacity-100">
+                      <span className="relative z-10 whitespace-nowrap text-sm font-medium opacity-0 transition-all duration-200 group-hover:opacity-100">
                         {item.label}
                       </span>
 
                       <ChevronRight
                         className={[
-                          "relative z-10 ml-auto h-4 w-4 shrink-0 transition-all duration-300",
+                          "relative z-10 ml-auto h-4 w-4 shrink-0 transition-all duration-200",
                           "opacity-0 group-hover:opacity-100",
                           isActive ? "text-cyan-300" : "text-white/35",
                         ].join(" ")}
@@ -149,31 +134,17 @@ export default function Sidebar() {
 
           {/* bottom profile */}
           <div className="p-3">
-            <div
-              className="
-                flex items-center gap-3 rounded-[26px]
-                border border-white/10 bg-white/[0.05]
-                p-3 backdrop-blur-xl
-                shadow-[inset_0_1px_0_rgba(255,255,255,0.06),0_10px_30px_rgba(0,0,0,0.18)]
-              "
-            >
-              <div
-                className="
-                  relative flex h-11 w-11 shrink-0 items-center justify-center
-                  rounded-2xl bg-gradient-to-br from-fuchsia-500/25 to-cyan-400/20
-                  text-sm font-semibold text-white
-                  shadow-[0_0_18px_rgba(168,85,247,0.16)]
-                "
-              >
+            <div className="flex items-center gap-3 rounded-[26px] border border-white/10 bg-white/[0.05] p-3 backdrop-blur-xl shadow-[inset_0_1px_0_rgba(255,255,255,0.06),0_10px_30px_rgba(0,0,0,0.18)]">
+              <div className="relative flex h-11 w-11 shrink-0 items-center justify-center rounded-2xl bg-gradient-to-br from-fuchsia-500/25 to-cyan-400/20 text-sm font-semibold text-white shadow-[0_0_18px_rgba(168,85,247,0.16)]">
                 RS
                 <div className="absolute -bottom-0.5 -right-0.5 h-3 w-3 rounded-full border border-slate-950 bg-emerald-400 shadow-[0_0_10px_rgba(74,222,128,0.85)]" />
               </div>
 
               <div className="min-w-0 overflow-hidden">
-                <p className="truncate text-sm font-medium text-white opacity-0 transition-all duration-300 group-hover:opacity-100">
+                <p className="truncate text-sm font-medium text-white opacity-0 transition-all duration-200 group-hover:opacity-100">
                   Ridzhan Admin
                 </p>
-                <p className="truncate text-xs text-white/60 opacity-0 transition-all duration-300 delay-75 group-hover:opacity-100">
+                <p className="truncate text-xs text-white/60 opacity-0 transition-all duration-200 delay-75 group-hover:opacity-100">
                   Gaming Club System
                 </p>
               </div>
