@@ -36,8 +36,8 @@ const navItems: NavItem[] = [
 ];
 
 const SIDEBAR_MODE_KEY = "ridzhan_sidebar_mode";
-const COLLAPSED_WIDTH = 92;
-const EXPANDED_WIDTH = 236;
+const COLLAPSED_WIDTH = 88;
+const EXPANDED_WIDTH = 248;
 
 export default function Sidebar() {
   const [sidebarMode, setSidebarMode] = useState<SidebarMode>("auto");
@@ -94,22 +94,25 @@ export default function Sidebar() {
   const sidebarWidth = isExpanded ? EXPANDED_WIDTH : COLLAPSED_WIDTH;
 
   const textClass = [
-    "transition-all duration-200",
+    "transition-all duration-300 ease-[cubic-bezier(0.22,1,0.36,1)]",
     isExpanded
       ? "opacity-100 translate-x-0"
-      : "pointer-events-none opacity-0 -translate-x-1",
+      : "pointer-events-none opacity-0 -translate-x-1.5",
   ].join(" ");
 
   const arrowClass = [
-    "ml-auto shrink-0 transition-all duration-200",
-    isExpanded ? "opacity-100 translate-x-0" : "opacity-0 translate-x-1",
+    "ml-auto shrink-0 transition-all duration-300 ease-[cubic-bezier(0.22,1,0.36,1)]",
+    isExpanded ? "opacity-100 translate-x-0" : "opacity-0 translate-x-1.5",
   ].join(" ");
 
   return (
     <aside
       aria-label="Sidebar navigation"
       className="fixed left-0 top-0 z-50 h-screen"
-      style={{ width: `${sidebarWidth}px` }}
+      style={{
+        width: `${sidebarWidth}px`,
+        transition: "width 420ms cubic-bezier(0.22, 1, 0.36, 1)",
+      }}
       onMouseEnter={() => {
         if (sidebarMode === "auto") setIsHovered(true);
       }}
@@ -120,34 +123,38 @@ export default function Sidebar() {
         }
       }}
     >
-      <div className="relative h-full overflow-visible border-r border-fuchsia-400/10 bg-[#07101f]/88 backdrop-blur-2xl shadow-[10px_0_40px_rgba(0,0,0,0.28)] transition-[width] duration-300 ease-out">
-        {/* layered background */}
-        <div className="absolute inset-0 bg-[radial-gradient(circle_at_top_left,rgba(217,70,239,0.22),transparent_30%),radial-gradient(circle_at_bottom_left,rgba(34,211,238,0.16),transparent_28%),radial-gradient(circle_at_bottom_center,rgba(56,189,248,0.08),transparent_25%),linear-gradient(180deg,rgba(255,255,255,0.05),rgba(255,255,255,0.02))]" />
+      <div className="relative h-full overflow-visible border-r border-cyan-300/20 bg-[rgba(7,16,31,0.72)] backdrop-blur-[24px] shadow-[10px_0_40px_rgba(0,0,0,0.28)]">
+        {/* glass layers */}
+        <div className="absolute inset-0 bg-[linear-gradient(180deg,rgba(255,255,255,0.12),rgba(255,255,255,0.03)_22%,rgba(255,255,255,0.01)_100%)]" />
+        <div className="absolute inset-0 bg-[radial-gradient(circle_at_top_left,rgba(217,70,239,0.22),transparent_30%),radial-gradient(circle_at_bottom_left,rgba(34,211,238,0.16),transparent_28%),radial-gradient(circle_at_bottom_center,rgba(56,189,248,0.08),transparent_25%)]" />
 
         {/* subtle grid */}
-        <div className="absolute inset-0 opacity-[0.05] [background-image:linear-gradient(rgba(255,255,255,0.08)_1px,transparent_1px),linear-gradient(90deg,rgba(255,255,255,0.08)_1px,transparent_1px)] [background-size:26px_26px]" />
+        <div className="absolute inset-0 opacity-[0.04] [background-image:linear-gradient(rgba(255,255,255,0.08)_1px,transparent_1px),linear-gradient(90deg,rgba(255,255,255,0.08)_1px,transparent_1px)] [background-size:26px_26px]" />
+
+        {/* inner top gloss */}
+        <div className="pointer-events-none absolute inset-x-0 top-0 h-24 bg-gradient-to-b from-white/10 to-transparent" />
 
         {/* neon right line */}
-        <div className="absolute right-0 top-0 h-full w-px bg-gradient-to-b from-fuchsia-400/90 via-cyan-400/80 to-blue-500/90 shadow-[0_0_18px_rgba(34,211,238,0.6)]" />
+        <div className="absolute right-0 top-0 h-full w-px bg-gradient-to-b from-fuchsia-400/80 via-cyan-300/90 to-blue-500/80 shadow-[0_0_18px_rgba(34,211,238,0.55)]" />
 
         {/* glow blobs */}
-        <div className="absolute -left-16 top-4 h-32 w-32 rounded-full bg-fuchsia-500/16 blur-3xl" />
-        <div className="absolute -left-10 bottom-16 h-36 w-36 rounded-full bg-cyan-500/14 blur-3xl" />
+        <div className="absolute -left-14 top-4 h-28 w-28 rounded-full bg-fuchsia-500/14 blur-3xl" />
+        <div className="absolute -left-8 bottom-16 h-32 w-32 rounded-full bg-cyan-500/12 blur-3xl" />
 
         <div className="relative flex h-full flex-col overflow-hidden">
           {/* top logo */}
-          <div className="px-3 pb-3 pt-4">
-            <div className="flex h-[56px] items-center gap-3 rounded-[22px] border border-white/10 bg-white/[0.06] px-3 backdrop-blur-xl shadow-[inset_0_1px_0_rgba(255,255,255,0.08),0_12px_30px_rgba(0,0,0,0.24)]">
-              <div className="relative flex h-10 w-10 shrink-0 items-center justify-center rounded-xl border border-white/10 bg-gradient-to-br from-fuchsia-500/30 via-violet-500/20 to-cyan-400/25 shadow-[0_0_24px_rgba(168,85,247,0.24)]">
-                <div className="absolute inset-0 rounded-xl bg-gradient-to-br from-white/10 to-transparent" />
-                <Gamepad2 className="relative h-5 w-5 text-white" />
+          <div className="px-3 pb-2.5 pt-3.5">
+            <div className="flex h-[56px] items-center gap-3 rounded-[20px] border border-white/12 bg-white/[0.08] px-3 backdrop-blur-xl shadow-[inset_0_1px_0_rgba(255,255,255,0.16),inset_0_-1px_0_rgba(255,255,255,0.03),0_8px_24px_rgba(0,0,0,0.20)]">
+              <div className="relative flex h-10 w-10 shrink-0 items-center justify-center rounded-[14px] border border-white/12 bg-[linear-gradient(135deg,rgba(217,70,239,0.22),rgba(56,189,248,0.14))] shadow-[inset_0_1px_0_rgba(255,255,255,0.14),0_0_20px_rgba(168,85,247,0.18)]">
+                <div className="absolute inset-0 rounded-[14px] bg-gradient-to-br from-white/10 to-transparent" />
+                <Gamepad2 className="relative h-[18px] w-[18px] text-white" />
               </div>
 
               <div className="min-w-0 flex-1 overflow-hidden">
-                <h2 className={`truncate whitespace-nowrap text-[16px] font-semibold text-white ${textClass}`}>
+                <h2 className={`truncate whitespace-nowrap text-[15px] font-semibold text-white ${textClass}`}>
                   Ridzhan SASS
                 </h2>
-                <p className={`truncate whitespace-nowrap text-[12px] text-white/60 ${textClass}`}>
+                <p className={`truncate whitespace-nowrap text-[11px] text-white/62 ${textClass}`}>
                   Admin panel
                 </p>
               </div>
@@ -156,7 +163,7 @@ export default function Sidebar() {
 
           {/* nav */}
           <nav className="flex-1 px-2.5 py-1">
-            <div className="space-y-2">
+            <div className="space-y-1.5">
               {navItems.map((item) => (
                 <NavLink
                   key={item.to}
@@ -165,11 +172,11 @@ export default function Sidebar() {
                   title={item.label}
                   className={({ isActive }) =>
                     [
-                      "relative flex h-[52px] items-center gap-3 overflow-hidden rounded-[20px] border px-3",
-                      "transition-all duration-200 ease-out",
+                      "relative flex h-[48px] items-center gap-3 overflow-hidden rounded-[18px] border px-3",
+                      "transition-all duration-300 ease-[cubic-bezier(0.22,1,0.36,1)]",
                       isActive
-                        ? "border-fuchsia-400/30 bg-gradient-to-r from-fuchsia-500/18 via-violet-500/12 to-cyan-400/16 text-cyan-300 shadow-[0_0_24px_rgba(168,85,247,0.24)]"
-                        : "border-transparent bg-white/[0.02] text-white/70 hover:border-white/10 hover:bg-white/[0.05] hover:text-white",
+                        ? "border-cyan-300/28 bg-[linear-gradient(90deg,rgba(217,70,239,0.16),rgba(56,189,248,0.14))] text-cyan-200 shadow-[inset_0_1px_0_rgba(255,255,255,0.12),0_0_24px_rgba(34,211,238,0.10)]"
+                        : "border-white/[0.04] bg-white/[0.03] text-white/72 hover:border-white/[0.08] hover:bg-white/[0.05] hover:text-white",
                     ].join(" ")
                   }
                 >
@@ -177,25 +184,25 @@ export default function Sidebar() {
                     <>
                       {isActive && (
                         <>
-                          <div className="absolute left-0 top-1/2 h-7 w-[3px] -translate-y-1/2 rounded-r-full bg-gradient-to-b from-fuchsia-400 to-cyan-400 shadow-[0_0_14px_rgba(34,211,238,0.85)]" />
-                          <div className="absolute inset-0 bg-[radial-gradient(circle_at_left,rgba(217,70,239,0.10),transparent_36%),radial-gradient(circle_at_right,rgba(34,211,238,0.08),transparent_30%)]" />
+                          <div className="absolute left-0 top-1/2 h-6 w-[3px] -translate-y-1/2 rounded-r-full bg-gradient-to-b from-fuchsia-400 to-cyan-300 shadow-[0_0_14px_rgba(34,211,238,0.75)]" />
+                          <div className="absolute inset-0 bg-[radial-gradient(circle_at_left,rgba(217,70,239,0.08),transparent_36%),radial-gradient(circle_at_right,rgba(34,211,238,0.08),transparent_30%)]" />
                         </>
                       )}
 
-                      <div className="relative z-10 flex h-9 w-9 shrink-0 items-center justify-center rounded-xl">
+                      <div className="relative z-10 flex h-8 w-8 shrink-0 items-center justify-center rounded-[12px]">
                         <item.icon
                           className={[
-                            "h-[18px] w-[18px] transition-all duration-200",
+                            "h-[17px] w-[17px] transition-all duration-300",
                             isActive
-                              ? "text-cyan-300 drop-shadow-[0_0_8px_rgba(34,211,238,0.8)]"
-                              : "text-white/80",
+                              ? "text-cyan-200 drop-shadow-[0_0_8px_rgba(34,211,238,0.55)]"
+                              : "text-white/78",
                           ].join(" ")}
                         />
                       </div>
 
                       <span
                         className={[
-                          "relative z-10 min-w-0 flex-1 truncate whitespace-nowrap text-[14px] font-medium",
+                          "relative z-10 min-w-0 flex-1 truncate whitespace-nowrap text-[13px] font-medium",
                           textClass,
                         ].join(" ")}
                       >
@@ -204,9 +211,9 @@ export default function Sidebar() {
 
                       <ChevronRight
                         className={[
-                          "relative z-10 h-4 w-4",
+                          "relative z-10 h-[14px] w-[14px]",
                           arrowClass,
-                          isActive ? "text-cyan-300" : "text-white/35",
+                          isActive ? "text-cyan-200" : "text-white/32",
                         ].join(" ")}
                       />
                     </>
@@ -217,23 +224,23 @@ export default function Sidebar() {
           </nav>
 
           {/* sidebar control */}
-          <div className="p-3" ref={controlRef}>
+          <div className="p-3 pt-2.5" ref={controlRef}>
             <div className="relative">
               <button
                 type="button"
                 onClick={() => setControlOpen((prev) => !prev)}
                 title="Sidebar boshqaruvi"
-                className="flex h-[56px] w-full items-center gap-3 rounded-[22px] border border-white/10 bg-white/[0.05] px-3 text-left backdrop-blur-xl shadow-[inset_0_1px_0_rgba(255,255,255,0.06),0_10px_30px_rgba(0,0,0,0.18)] transition-all duration-200 hover:bg-white/[0.08]"
+                className="flex h-[54px] w-full items-center gap-3 rounded-[20px] border border-white/10 bg-white/[0.07] px-3 text-left backdrop-blur-xl shadow-[inset_0_1px_0_rgba(255,255,255,0.14),inset_0_-1px_0_rgba(255,255,255,0.03),0_10px_26px_rgba(0,0,0,0.18)] transition-all duration-300 ease-[cubic-bezier(0.22,1,0.36,1)] hover:bg-white/[0.09]"
               >
-                <div className="relative flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-gradient-to-br from-fuchsia-500/25 to-cyan-400/20 text-white shadow-[0_0_18px_rgba(168,85,247,0.16)]">
-                  <PanelLeft className="h-5 w-5" />
+                <div className="relative flex h-10 w-10 shrink-0 items-center justify-center rounded-[14px] border border-white/10 bg-[linear-gradient(135deg,rgba(217,70,239,0.20),rgba(56,189,248,0.16))] text-white shadow-[inset_0_1px_0_rgba(255,255,255,0.12),0_0_18px_rgba(34,211,238,0.10)]">
+                  <PanelLeft className="h-[18px] w-[18px]" />
                 </div>
 
                 <div className="min-w-0 flex-1 overflow-hidden">
-                  <p className={`truncate whitespace-nowrap text-[14px] font-medium text-white ${textClass}`}>
+                  <p className={`truncate whitespace-nowrap text-[13px] font-medium text-white ${textClass}`}>
                     Sidebar boshqaruvi
                   </p>
-                  <p className={`truncate whitespace-nowrap text-[12px] text-white/60 ${textClass}`}>
+                  <p className={`truncate whitespace-nowrap text-[11px] text-white/60 ${textClass}`}>
                     {sidebarMode === "expanded"
                       ? "Har doim ochiq"
                       : sidebarMode === "collapsed"
@@ -244,23 +251,26 @@ export default function Sidebar() {
               </button>
 
               {controlOpen && (
-                <div className="absolute bottom-full left-0 mb-2 z-[80] w-[210px] overflow-hidden rounded-2xl border border-white/10 bg-[#1a1c22]/95 shadow-[0_18px_50px_rgba(0,0,0,0.45)] backdrop-blur-2xl">
-                  <div className="border-b border-white/10 px-4 py-3">
-                    <p className="text-[13px] font-medium text-white/85">
-                      Sidebar boshqaruvi
+                <div className="absolute left-0 bottom-[calc(100%+12px)] z-[120] w-[220px] overflow-hidden rounded-[18px] border border-white/12 bg-[rgba(24,27,35,0.92)] backdrop-blur-[24px] shadow-[0_20px_50px_rgba(0,0,0,0.45),inset_0_1px_0_rgba(255,255,255,0.14)]">
+                  <div className="absolute inset-0 bg-[linear-gradient(180deg,rgba(255,255,255,0.10),rgba(255,255,255,0.02)_24%,rgba(255,255,255,0.01)_100%)]" />
+                  <div className="absolute inset-0 bg-[radial-gradient(circle_at_top_left,rgba(217,70,239,0.12),transparent_36%),radial-gradient(circle_at_bottom_right,rgba(34,211,238,0.10),transparent_36%)]" />
+
+                  <div className="relative border-b border-white/8 px-4 py-3">
+                    <p className="text-[12px] font-medium text-white/72">
+                      Sidebar control
                     </p>
                   </div>
 
-                  <div className="p-2">
+                  <div className="relative p-2">
                     <button
                       type="button"
                       onClick={() => {
                         setSidebarMode("expanded");
                         setControlOpen(false);
                       }}
-                      className="flex w-full items-center justify-between rounded-xl px-3 py-2.5 text-[14px] text-white/80 transition hover:bg-white/5"
+                      className="flex w-full items-center justify-between rounded-[12px] px-3 py-2.5 text-[13px] text-white/84 transition-all duration-200 hover:bg-white/[0.05]"
                     >
-                      <span>Har doim ochiq</span>
+                      <span>Expanded</span>
                       {sidebarMode === "expanded" && (
                         <span className="h-2.5 w-2.5 rounded-full bg-white/80" />
                       )}
@@ -272,9 +282,9 @@ export default function Sidebar() {
                         setSidebarMode("collapsed");
                         setControlOpen(false);
                       }}
-                      className="flex w-full items-center justify-between rounded-xl px-3 py-2.5 text-[14px] text-white/80 transition hover:bg-white/5"
+                      className="flex w-full items-center justify-between rounded-[12px] px-3 py-2.5 text-[13px] text-white/84 transition-all duration-200 hover:bg-white/[0.05]"
                     >
-                      <span>Har doim yopiq</span>
+                      <span>Collapsed</span>
                       {sidebarMode === "collapsed" && (
                         <span className="h-2.5 w-2.5 rounded-full bg-white/80" />
                       )}
@@ -286,9 +296,9 @@ export default function Sidebar() {
                         setSidebarMode("auto");
                         setControlOpen(false);
                       }}
-                      className="flex w-full items-center justify-between rounded-xl px-3 py-2.5 text-[14px] text-white/80 transition hover:bg-white/5"
+                      className="flex w-full items-center justify-between rounded-[12px] px-3 py-2.5 text-[13px] text-white/84 transition-all duration-200 hover:bg-white/[0.05]"
                     >
-                      <span>Avto (hover)</span>
+                      <span>Expand on hover</span>
                       {sidebarMode === "auto" && (
                         <span className="h-2.5 w-2.5 rounded-full bg-white/80" />
                       )}
