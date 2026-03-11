@@ -126,7 +126,7 @@ export function Dashboard() {
           ))}
         </div>
       </div>
- <div className="bg-red-500 text-white p-6 text-2xl">Tailwind ishladi</div>
+ 
       {/* Recent Bookings */}
       <div className="bg-slate-900/40 backdrop-blur-xl rounded-xl border border-purple-500/20 shadow-lg shadow-purple-500/5 p-6">
         <h2 className="text-xl font-bold text-white mb-6">Recent Bookings</h2>
