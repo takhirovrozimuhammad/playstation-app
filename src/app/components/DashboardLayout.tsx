@@ -62,7 +62,7 @@ export function DashboardLayout() {
       >
         <Header />
 
-        <main className="flex-1 pt-[82px] md:px-6 md:pb-6">
+        <main className="flex-1 pt-[81px] md:px-6 md:pb-6">
           <Outlet />
         </main>
       </div>
