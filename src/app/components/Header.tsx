@@ -144,7 +144,7 @@ export function Header() {
                   <Input
                     type="text"
                     placeholder="Search clients, bookings, rooms..."
-                    className="relative z-10 h-[42px] border-0 bg-transparent pl-11 pr-4 text-sm text-slate-800 placeholder:text-slate-500 shadow-none ring-0 focus-visible:ring-0 focus-visible:ring-offset-0 dark:text-slate-100 dark:placeholder:text-slate-500"
+                    className="relative z-10 h-[42px] border-0 bg-transparent pl-11  ml-[100px]  pr-4 text-sm text-slate-800 placeholder:text-slate-500 shadow-none ring-0 focus-visible:ring-0 focus-visible:ring-offset-0 dark:text-slate-100 dark:placeholder:text-slate-500"
                   />
                 </div>
               </div>
