@@ -17,6 +17,7 @@ import {
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuLabel,
+  DropdownMenuPortal,
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "./ui/dropdown-menu";
@@ -50,6 +51,7 @@ export function Header() {
 
     const prefersDark = window.matchMedia("(prefers-color-scheme: dark)").matches;
     const initialTheme: ThemeMode = prefersDark ? "dark" : "light";
+
     setTheme(initialTheme);
     applyTheme(initialTheme);
   }, []);
@@ -102,20 +104,13 @@ export function Header() {
     navigate("/login");
   };
 
-  const leftOffset = useMemo(() => {
-    return sidebarMode === "expanded" ? EXPANDED_WIDTH : COLLAPSED_WIDTH + 1;
+  const inputOffset = useMemo(() => {
+    if (sidebarMode !== "expanded") return 0;
+    return EXPANDED_WIDTH - (COLLAPSED_WIDTH + 1);
   }, [sidebarMode]);
 
-  const searchOffset = sidebarMode === "expanded" ? EXPANDED_WIDTH - (COLLAPSED_WIDTH + 1) : 0;
-
   return (
-    <header
-      className="fixed top-0 z-30 h-[78px] overflow-visible transition-[left,width] duration-500 ease-[cubic-bezier(0.22,1,0.36,1)]"
-      style={{
-        left: `${leftOffset}px`,
-        width: `calc(100% - ${leftOffset}px)`,
-      }}
-    >
+    <header className="fixed inset-x-0 top-0 z-40 h-[78px]">
       <div className="relative h-full overflow-visible border-b border-slate-200/70 bg-white/70 backdrop-blur-3xl transition-colors duration-300 dark:border-cyan-400/15 dark:bg-[#07101f]/58">
         {/* base layer */}
         <div className="absolute inset-0 bg-[linear-gradient(180deg,rgba(255,255,255,0.92),rgba(248,250,252,0.82))] dark:bg-[linear-gradient(180deg,rgba(7,16,31,0.96),rgba(7,16,31,0.78))]" />
@@ -132,11 +127,11 @@ export function Header() {
 
         <div className="relative flex h-full items-center justify-between gap-4 px-4 md:px-6">
           {/* Search */}
-          <div
-            className="flex-1 transition-[padding-left] duration-500 ease-[cubic-bezier(0.22,1,0.36,1)]"
-            style={{ paddingLeft: `${searchOffset}px` }}
-          >
-            <div className="max-w-[520px]">
+          <div className="min-w-0 flex-1">
+            <div
+              className="max-w-[520px] transition-[margin-left] duration-500 ease-[cubic-bezier(0.22,1,0.36,1)]"
+              style={{ marginLeft: `${inputOffset}px` }}
+            >
               <div className="group relative">
                 <div className="absolute -inset-[1px] rounded-[20px] bg-gradient-to-r from-violet-500/0 via-violet-400/20 to-cyan-400/20 opacity-0 blur-sm transition duration-300 group-focus-within:opacity-100 dark:from-fuchsia-500/0 dark:via-fuchsia-400/20 dark:to-cyan-400/20" />
 
@@ -197,7 +192,7 @@ export function Header() {
               <DropdownMenuTrigger asChild>
                 <Button
                   variant="ghost"
-                  className="group h-auto rounded-[20px] border border-slate-300/70 bg-white/60 px-2.5 py-1.5 text-slate-700 shadow-[inset_0_1px_0_rgba(255,255,255,0.95),0_10px_24px_rgba(15,23,42,0.08)] backdrop-blur-2xl transition-all duration-300 hover:border-slate-400/70 hover:bg-white/80 dark:border-white/10 dark:bg-white/[0.05] dark:text-slate-300 dark:shadow-[inset_0_1px_0_rgba(255,255,255,0.07),0_10px_24px_rgba(0,0,0,0.16)] dark:hover:border-white/15 dark:hover:bg-white/[0.08]"
+                  className="group relative h-auto rounded-[20px] border border-slate-300/70 bg-white/60 px-2.5 py-1.5 text-slate-700 shadow-[inset_0_1px_0_rgba(255,255,255,0.95),0_10px_24px_rgba(15,23,42,0.08)] backdrop-blur-2xl transition-all duration-300 hover:border-slate-400/70 hover:bg-white/80 dark:border-white/10 dark:bg-white/[0.05] dark:text-slate-300 dark:shadow-[inset_0_1px_0_rgba(255,255,255,0.07),0_10px_24px_rgba(0,0,0,0.16)] dark:hover:border-white/15 dark:hover:bg-white/[0.08]"
                 >
                   <div className="relative flex items-center gap-3">
                     <div className="hidden text-right sm:block">
@@ -222,69 +217,71 @@ export function Header() {
                 </Button>
               </DropdownMenuTrigger>
 
-              <DropdownMenuContent
-                align="end"
-                sideOffset={10}
-                className="z-[120] w-64 overflow-hidden rounded-[24px] border border-slate-300/70 bg-white/95 p-1.5 text-slate-800 shadow-[0_24px_60px_rgba(15,23,42,0.18)] backdrop-blur-3xl dark:border-white/10 dark:bg-[#0b1220]/95 dark:text-slate-200 dark:shadow-[0_24px_60px_rgba(0,0,0,0.52)]"
-              >
-                <div className="absolute inset-0 bg-[radial-gradient(circle_at_top_left,rgba(168,85,247,0.10),transparent_24%),radial-gradient(circle_at_bottom_right,rgba(59,130,246,0.10),transparent_24%)] dark:bg-[radial-gradient(circle_at_top_left,rgba(217,70,239,0.14),transparent_24%),radial-gradient(circle_at_bottom_right,rgba(34,211,238,0.12),transparent_24%)]" />
-                <div className="absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-slate-400/30 to-transparent dark:via-white/25" />
+              <DropdownMenuPortal>
+                <DropdownMenuContent
+                  align="end"
+                  sideOffset={10}
+                  className="z-[9999] w-64 overflow-hidden rounded-[24px] border border-slate-300/70 bg-white/95 p-1.5 text-slate-800 shadow-[0_24px_60px_rgba(15,23,42,0.18)] backdrop-blur-3xl dark:border-white/10 dark:bg-[#0b1220]/95 dark:text-slate-200 dark:shadow-[0_24px_60px_rgba(0,0,0,0.52)]"
+                >
+                  <div className="absolute inset-0 bg-[radial-gradient(circle_at_top_left,rgba(168,85,247,0.10),transparent_24%),radial-gradient(circle_at_bottom_right,rgba(59,130,246,0.10),transparent_24%)] dark:bg-[radial-gradient(circle_at_top_left,rgba(217,70,239,0.14),transparent_24%),radial-gradient(circle_at_bottom_right,rgba(34,211,238,0.12),transparent_24%)]" />
+                  <div className="absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-slate-400/30 to-transparent dark:via-white/25" />
 
-                <div className="relative">
-                  <DropdownMenuLabel className="px-3 py-3">
-                    <div className="flex items-center gap-3">
-                      <div className="flex h-11 w-11 items-center justify-center rounded-2xl border border-white/30 bg-gradient-to-br from-fuchsia-500 via-violet-400 to-cyan-400 shadow-[0_0_20px_rgba(168,85,247,0.20)]">
-                        <User className="h-5 w-5 text-white" />
+                  <div className="relative">
+                    <DropdownMenuLabel className="px-3 py-3">
+                      <div className="flex items-center gap-3">
+                        <div className="flex h-11 w-11 items-center justify-center rounded-2xl border border-white/30 bg-gradient-to-br from-fuchsia-500 via-violet-400 to-cyan-400 shadow-[0_0_20px_rgba(168,85,247,0.20)]">
+                          <User className="h-5 w-5 text-white" />
+                        </div>
+
+                        <div>
+                          <p className="text-sm font-semibold text-slate-900 dark:text-slate-100">
+                            Receptionist
+                          </p>
+                          <p className="text-xs text-slate-500 dark:text-slate-400">
+                            Admin account
+                          </p>
+                        </div>
                       </div>
+                    </DropdownMenuLabel>
 
-                      <div>
-                        <p className="text-sm font-semibold text-slate-900 dark:text-slate-100">
-                          Receptionist
-                        </p>
-                        <p className="text-xs text-slate-500 dark:text-slate-400">
-                          Admin account
-                        </p>
-                      </div>
-                    </div>
-                  </DropdownMenuLabel>
+                    <DropdownMenuSeparator className="bg-slate-200 dark:bg-white/10" />
 
-                  <DropdownMenuSeparator className="bg-slate-200 dark:bg-white/10" />
+                    <DropdownMenuItem
+                      onClick={() => navigate("/settings")}
+                      className="mt-1 cursor-pointer rounded-2xl px-3 py-2.5 text-slate-700 outline-none transition focus:bg-slate-100 focus:text-slate-900 dark:text-slate-300 dark:focus:bg-white/[0.06] dark:focus:text-slate-100"
+                    >
+                      <User className="mr-2 h-4 w-4" />
+                      <span>Profile</span>
+                    </DropdownMenuItem>
 
-                  <DropdownMenuItem
-                    onClick={() => navigate("/settings")}
-                    className="mt-1 cursor-pointer rounded-2xl px-3 py-2.5 text-slate-700 outline-none transition focus:bg-slate-100 focus:text-slate-900 dark:text-slate-300 dark:focus:bg-white/[0.06] dark:focus:text-slate-100"
-                  >
-                    <User className="mr-2 h-4 w-4" />
-                    <span>Profile</span>
-                  </DropdownMenuItem>
+                    <DropdownMenuItem
+                      onClick={() => navigate("/settings")}
+                      className="cursor-pointer rounded-2xl px-3 py-2.5 text-slate-700 outline-none transition focus:bg-slate-100 focus:text-slate-900 dark:text-slate-300 dark:focus:bg-white/[0.06] dark:focus:text-slate-100"
+                    >
+                      <Settings className="mr-2 h-4 w-4" />
+                      <span>Preferences</span>
+                    </DropdownMenuItem>
 
-                  <DropdownMenuItem
-                    onClick={() => navigate("/settings")}
-                    className="cursor-pointer rounded-2xl px-3 py-2.5 text-slate-700 outline-none transition focus:bg-slate-100 focus:text-slate-900 dark:text-slate-300 dark:focus:bg-white/[0.06] dark:focus:text-slate-100"
-                  >
-                    <Settings className="mr-2 h-4 w-4" />
-                    <span>Preferences</span>
-                  </DropdownMenuItem>
+                    <DropdownMenuItem
+                      onClick={() => navigate("/notifications")}
+                      className="cursor-pointer rounded-2xl px-3 py-2.5 text-slate-700 outline-none transition focus:bg-slate-100 focus:text-slate-900 dark:text-slate-300 dark:focus:bg-white/[0.06] dark:focus:text-slate-100"
+                    >
+                      <Bell className="mr-2 h-4 w-4" />
+                      <span>Notifications</span>
+                    </DropdownMenuItem>
 
-                  <DropdownMenuItem
-                    onClick={() => navigate("/notifications")}
-                    className="cursor-pointer rounded-2xl px-3 py-2.5 text-slate-700 outline-none transition focus:bg-slate-100 focus:text-slate-900 dark:text-slate-300 dark:focus:bg-white/[0.06] dark:focus:text-slate-100"
-                  >
-                    <Bell className="mr-2 h-4 w-4" />
-                    <span>Notifications</span>
-                  </DropdownMenuItem>
+                    <DropdownMenuSeparator className="my-1 bg-slate-200 dark:bg-white/10" />
 
-                  <DropdownMenuSeparator className="my-1 bg-slate-200 dark:bg-white/10" />
-
-                  <DropdownMenuItem
-                    onClick={handleLogout}
-                    className="cursor-pointer rounded-2xl px-3 py-2.5 text-red-500 outline-none transition focus:bg-red-50 focus:text-red-600 dark:text-red-400 dark:focus:bg-white/[0.06] dark:focus:text-red-300"
-                  >
-                    <LogOut className="mr-2 h-4 w-4" />
-                    <span>Logout</span>
-                  </DropdownMenuItem>
-                </div>
-              </DropdownMenuContent>
+                    <DropdownMenuItem
+                      onClick={handleLogout}
+                      className="cursor-pointer rounded-2xl px-3 py-2.5 text-red-500 outline-none transition focus:bg-red-50 focus:text-red-600 dark:text-red-400 dark:focus:bg-white/[0.06] dark:focus:text-red-300"
+                    >
+                      <LogOut className="mr-2 h-4 w-4" />
+                      <span>Logout</span>
+                    </DropdownMenuItem>
+                  </div>
+                </DropdownMenuContent>
+              </DropdownMenuPortal>
             </DropdownMenu>
           </div>
         </div>
