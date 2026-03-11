@@ -22,7 +22,7 @@ type NavItem = {
   exact?: boolean;
 };
 
-type SidebarMode = "expanded" | "collapsed" | "auto";
+export type SidebarMode = "expanded" | "collapsed" | "auto";
 
 const navItems: NavItem[] = [
   { to: "/", icon: LayoutDashboard, label: "Boshqaruv paneli", exact: true },
@@ -36,9 +36,9 @@ const navItems: NavItem[] = [
   { to: "/settings", icon: Settings, label: "Sozlamalar" },
 ];
 
-const SIDEBAR_MODE_KEY = "ridzhan_sidebar_mode";
-const COLLAPSED_WIDTH = 94;
-const EXPANDED_WIDTH = 248;
+export const SIDEBAR_MODE_KEY = "ridzhan_sidebar_mode";
+export const COLLAPSED_WIDTH = 94;
+export const EXPANDED_WIDTH = 248;
 
 export default function Sidebar() {
   const [sidebarMode, setSidebarMode] = useState<SidebarMode>("auto");
@@ -62,6 +62,7 @@ export default function Sidebar() {
 
   useEffect(() => {
     localStorage.setItem(SIDEBAR_MODE_KEY, sidebarMode);
+    window.dispatchEvent(new CustomEvent("ridzhan-sidebar-mode-change"));
   }, [sidebarMode]);
 
   useEffect(() => {
@@ -95,14 +96,14 @@ export default function Sidebar() {
   const sidebarWidth = isExpanded ? EXPANDED_WIDTH : COLLAPSED_WIDTH;
 
   const textClass = [
-    "transition-all duration-300 ease-out",
+    "transition-all duration-500 ease-[cubic-bezier(0.22,1,0.36,1)]",
     isExpanded
       ? "opacity-100 translate-x-0"
       : "pointer-events-none opacity-0 -translate-x-2",
   ].join(" ");
 
   const arrowClass = [
-    "ml-auto shrink-0 transition-all duration-300 ease-out",
+    "ml-auto shrink-0 transition-all duration-500 ease-[cubic-bezier(0.22,1,0.36,1)]",
     isExpanded ? "opacity-100 translate-x-0" : "opacity-0 translate-x-2",
   ].join(" ");
 
@@ -121,7 +122,7 @@ export default function Sidebar() {
         }
       }}
     >
-      <div className="relative h-full overflow-visible transition-[width] duration-300 ease-out">
+      <div className="relative h-full overflow-visible transition-[width] duration-500 ease-[cubic-bezier(0.22,1,0.36,1)]">
         {/* Outer edge glow */}
         <div className="absolute inset-y-3 left-2 right-0 rounded-r-[34px] bg-gradient-to-b from-fuchsia-500/10 via-violet-500/5 to-cyan-400/10 blur-xl dark:from-fuchsia-500/20 dark:via-violet-500/10 dark:to-cyan-400/20" />
 
@@ -174,7 +175,7 @@ export default function Sidebar() {
 
                 <Sparkles
                   className={[
-                    "h-4 w-4 shrink-0 text-cyan-600/80 transition-all duration-300 dark:text-cyan-300/80",
+                    "h-4 w-4 shrink-0 text-cyan-600/80 transition-all duration-500 ease-[cubic-bezier(0.22,1,0.36,1)] dark:text-cyan-300/80",
                     isExpanded ? "opacity-100 scale-100" : "opacity-0 scale-75",
                   ].join(" ")}
                 />
