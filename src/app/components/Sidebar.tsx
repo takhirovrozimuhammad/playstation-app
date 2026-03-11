@@ -1,4 +1,4 @@
-import { NavLink } from "react-router";
+import { NavLink } from "react-router-dom";
 import {
   LayoutDashboard,
   Gamepad2,
@@ -10,7 +10,7 @@ import {
   Settings,
   BookOpen,
   ChevronRight,
-} from "lucide-react";
+} from "lucide-react"; 
 
 const navItems = [
   { to: "/", icon: LayoutDashboard, label: "Dashboard", exact: true },
