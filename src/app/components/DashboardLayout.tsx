@@ -4,7 +4,7 @@ import { Header } from "./Header";
 
 export function DashboardLayout() {
   return (
-    <div className="group min-h-screen overflow-x-hidden bg-[#050816] text-white">
+    <div className="min-h-screen overflow-x-hidden bg-[#050816] text-white">
       {/* Main background */}
       <div className="fixed inset-0 -z-20 bg-[radial-gradient(circle_at_top_left,rgba(217,70,239,0.16),transparent_24%),radial-gradient(circle_at_bottom_left,rgba(34,211,238,0.10),transparent_22%),linear-gradient(180deg,#050816_0%,#07101f_100%)]" />
 
@@ -13,15 +13,9 @@ export function DashboardLayout() {
 
       <Sidebar />
 
-      <div
-        className="
-          relative flex min-h-screen flex-1 flex-col
-          pl-[104px] group-hover:pl-[260px]
-          transition-[padding] duration-500 ease-[cubic-bezier(0.22,1,0.36,1)]
-        "
-      >
+      {/* Main content never moves */}
+      <div className="relative flex min-h-screen flex-col pl-[104px]">
         <Header />
-
         <main className="flex-1 p-4 md:p-6">
           <Outlet />
         </main>
