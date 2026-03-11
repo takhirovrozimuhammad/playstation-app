@@ -137,14 +137,14 @@ export function Header() {
 
                 <div className="relative overflow-hidden rounded-[20px] border border-slate-300/70 bg-white/60 shadow-[inset_0_1px_0_rgba(255,255,255,0.9),0_8px_24px_rgba(15,23,42,0.08)] backdrop-blur-2xl transition-all duration-300 group-focus-within:border-violet-400/40 group-focus-within:bg-white/80 dark:border-white/10 dark:bg-white/[0.05] dark:shadow-[inset_0_1px_0_rgba(255,255,255,0.07),0_8px_24px_rgba(0,0,0,0.18)] dark:group-focus-within:border-fuchsia-400/30 dark:group-focus-within:bg-white/[0.08]">
                   <div className="absolute inset-0 bg-gradient-to-r from-white/70 via-transparent to-white/30 dark:from-white/[0.05] dark:via-transparent dark:to-white/[0.03]" />
-                  <div className="absolute inset-y-0 left-0 w-14 bg-gradient-to-r from-violet-500/8 to-transparent dark:from-fuchsia-500/8" />
+                  <div className="absolute inset-y-0  ml-[100px] w-14 bg-gradient-to-r from-violet-500/8 to-transparent dark:from-fuchsia-500/8" />
 
                   <Search className="pointer-events-none absolute left-4 top-1/2 z-10 h-4 w-4 -translate-y-1/2 text-slate-500 transition-colors duration-300 group-focus-within:text-cyan-600 dark:text-slate-400 dark:group-focus-within:text-cyan-300" />
 
                   <Input
                     type="text"
                     placeholder="Search clients, bookings, rooms..."
-                    className="relative z-10 h-[42px] border-0 bg-transparent pl-11  ml-[100px]  pr-4 text-sm text-slate-800 placeholder:text-slate-500 shadow-none ring-0 focus-visible:ring-0 focus-visible:ring-offset-0 dark:text-slate-100 dark:placeholder:text-slate-500"
+                    className="relative z-10 h-[42px] border-0 bg-transparent pl-11   pr-4 text-sm text-slate-800 placeholder:text-slate-500 shadow-none ring-0 focus-visible:ring-0 focus-visible:ring-offset-0 dark:text-slate-100 dark:placeholder:text-slate-500"
                   />
                 </div>
               </div>
