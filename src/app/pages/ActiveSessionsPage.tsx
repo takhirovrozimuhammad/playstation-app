@@ -110,7 +110,7 @@ export function ActiveSessionsPage() {
               </div>
               <div className="space-y-2">
                 <Label htmlFor="session-duration" className="text-slate-300">
-                  Duration (hours)
+                  Duration 
                 </Label>
                 <Input
                   id="session-duration"
