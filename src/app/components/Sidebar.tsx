@@ -12,6 +12,7 @@ import {
   BookOpen,
   ChevronRight,
   PanelLeft,
+  Sparkles,
 } from "lucide-react";
 
 type NavItem = {
@@ -36,8 +37,8 @@ const navItems: NavItem[] = [
 ];
 
 const SIDEBAR_MODE_KEY = "ridzhan_sidebar_mode";
-const COLLAPSED_WIDTH = 92;
-const EXPANDED_WIDTH = 236;
+const COLLAPSED_WIDTH = 94;
+const EXPANDED_WIDTH = 248;
 
 export default function Sidebar() {
   const [sidebarMode, setSidebarMode] = useState<SidebarMode>("auto");
@@ -94,15 +95,15 @@ export default function Sidebar() {
   const sidebarWidth = isExpanded ? EXPANDED_WIDTH : COLLAPSED_WIDTH;
 
   const textClass = [
-    "transition-all duration-200",
+    "transition-all duration-300 ease-out",
     isExpanded
       ? "opacity-100 translate-x-0"
-      : "pointer-events-none opacity-0 -translate-x-1",
+      : "pointer-events-none opacity-0 -translate-x-2",
   ].join(" ");
 
   const arrowClass = [
-    "ml-auto shrink-0 transition-all duration-200",
-    isExpanded ? "opacity-100 translate-x-0" : "opacity-0 translate-x-1",
+    "ml-auto shrink-0 transition-all duration-300 ease-out",
+    isExpanded ? "opacity-100 translate-x-0" : "opacity-0 translate-x-2",
   ].join(" ");
 
   return (
@@ -120,183 +121,228 @@ export default function Sidebar() {
         }
       }}
     >
-      <div className="relative h-full overflow-visible border-r border-fuchsia-400/10 bg-[#07101f]/88 backdrop-blur-2xl shadow-[10px_0_40px_rgba(0,0,0,0.28)] transition-[width] duration-300 ease-out">
-        {/* layered background */}
-        <div className="absolute inset-0 bg-[radial-gradient(circle_at_top_left,rgba(217,70,239,0.22),transparent_30%),radial-gradient(circle_at_bottom_left,rgba(34,211,238,0.16),transparent_28%),radial-gradient(circle_at_bottom_center,rgba(56,189,248,0.08),transparent_25%),linear-gradient(180deg,rgba(255,255,255,0.05),rgba(255,255,255,0.02))]" />
+      <div className="relative h-full overflow-visible transition-[width] duration-300 ease-out">
+        {/* Outer neon edge */}
+        <div className="absolute inset-y-3 left-2 right-0 rounded-r-[34px] bg-gradient-to-b from-fuchsia-500/20 via-violet-500/10 to-cyan-400/20 blur-xl" />
 
-        {/* subtle grid */}
-        <div className="absolute inset-0 opacity-[0.05] [background-image:linear-gradient(rgba(255,255,255,0.08)_1px,transparent_1px),linear-gradient(90deg,rgba(255,255,255,0.08)_1px,transparent_1px)] [background-size:26px_26px]" />
+        {/* Main glass shell */}
+        <div className="relative h-full overflow-hidden rounded-r-[34px] border-r border-t border-b border-white/10 bg-white/[0.06] shadow-[0_20px_60px_rgba(0,0,0,0.45)] backdrop-blur-3xl">
+          {/* Deep background */}
+          <div className="absolute inset-0 bg-[linear-gradient(180deg,rgba(10,14,30,0.94),rgba(7,11,24,0.90))]" />
 
-        {/* neon right line */}
-        <div className="absolute right-0 top-0 h-full w-px bg-gradient-to-b from-fuchsia-400/90 via-cyan-400/80 to-blue-500/90 shadow-[0_0_18px_rgba(34,211,238,0.6)]" />
+          {/* iOS glass reflections */}
+          <div className="absolute inset-0 bg-[radial-gradient(circle_at_top_left,rgba(255,255,255,0.14),transparent_24%),radial-gradient(circle_at_bottom_left,rgba(34,211,238,0.12),transparent_24%),radial-gradient(circle_at_top,rgba(217,70,239,0.14),transparent_26%)]" />
 
-        {/* glow blobs */}
-        <div className="absolute -left-16 top-4 h-32 w-32 rounded-full bg-fuchsia-500/16 blur-3xl" />
-        <div className="absolute -left-10 bottom-16 h-36 w-36 rounded-full bg-cyan-500/14 blur-3xl" />
+          {/* cyber gradients */}
+          <div className="absolute inset-0 bg-[radial-gradient(circle_at_0%_0%,rgba(217,70,239,0.22),transparent_28%),radial-gradient(circle_at_0%_100%,rgba(34,211,238,0.16),transparent_30%),radial-gradient(circle_at_50%_100%,rgba(59,130,246,0.10),transparent_24%)]" />
 
-        <div className="relative flex h-full flex-col overflow-hidden">
-          {/* top logo */}
-          <div className="px-3 pb-3 pt-4">
-            <div className="flex h-[56px] items-center gap-3 rounded-[22px] border border-white/10 bg-white/[0.06] px-3 backdrop-blur-xl shadow-[inset_0_1px_0_rgba(255,255,255,0.08),0_12px_30px_rgba(0,0,0,0.24)]">
-              <div className="relative flex h-10 w-10 shrink-0 items-center justify-center rounded-xl border border-white/10 bg-gradient-to-br from-fuchsia-500/30 via-violet-500/20 to-cyan-400/25 shadow-[0_0_24px_rgba(168,85,247,0.24)]">
-                <div className="absolute inset-0 rounded-xl bg-gradient-to-br from-white/10 to-transparent" />
-                <Gamepad2 className="relative h-5 w-5 text-white" />
-              </div>
+          {/* grid */}
+          <div className="absolute inset-0 opacity-[0.055] [background-image:linear-gradient(rgba(255,255,255,0.08)_1px,transparent_1px),linear-gradient(90deg,rgba(255,255,255,0.08)_1px,transparent_1px)] [background-size:26px_26px]" />
 
-              <div className="min-w-0 flex-1 overflow-hidden">
-                <h2 className={`truncate whitespace-nowrap text-[16px] font-semibold text-white ${textClass}`}>
-                  Ridzhan SASS
-                </h2>
-                <p className={`truncate whitespace-nowrap text-[12px] text-white/60 ${textClass}`}>
-                  Admin panel
-                </p>
-              </div>
-            </div>
-          </div>
+          {/* top shine */}
+          <div className="absolute left-0 top-0 h-px w-full bg-gradient-to-r from-transparent via-white/30 to-transparent" />
 
-          {/* nav */}
-          <nav className="flex-1 px-2.5 py-1">
-            <div className="space-y-2">
-              {navItems.map((item) => (
-                <NavLink
-                  key={item.to}
-                  to={item.to}
-                  end={item.exact}
-                  title={item.label}
-                  className={({ isActive }) =>
-                    [
-                      "relative flex h-[52px] items-center gap-3 overflow-hidden rounded-[20px] border px-3",
-                      "transition-all duration-200 ease-out",
-                      isActive
-                        ? "border-fuchsia-400/30 bg-gradient-to-r from-fuchsia-500/18 via-violet-500/12 to-cyan-400/16 text-cyan-300 shadow-[0_0_24px_rgba(168,85,247,0.24)]"
-                        : "border-transparent bg-white/[0.02] text-white/70 hover:border-white/10 hover:bg-white/[0.05] hover:text-white",
-                    ].join(" ")
-                  }
-                >
-                  {({ isActive }) => (
-                    <>
-                      {isActive && (
-                        <>
-                          <div className="absolute left-0 top-1/2 h-7 w-[3px] -translate-y-1/2 rounded-r-full bg-gradient-to-b from-fuchsia-400 to-cyan-400 shadow-[0_0_14px_rgba(34,211,238,0.85)]" />
-                          <div className="absolute inset-0 bg-[radial-gradient(circle_at_left,rgba(217,70,239,0.10),transparent_36%),radial-gradient(circle_at_right,rgba(34,211,238,0.08),transparent_30%)]" />
-                        </>
-                      )}
+          {/* right neon border */}
+          <div className="absolute right-0 top-0 h-full w-px bg-gradient-to-b from-fuchsia-400 via-violet-300 to-cyan-300 shadow-[0_0_18px_rgba(34,211,238,0.6)]" />
 
-                      <div className="relative z-10 flex h-9 w-9 shrink-0 items-center justify-center rounded-xl">
-                        <item.icon
-                          className={[
-                            "h-[18px] w-[18px] transition-all duration-200",
-                            isActive
-                              ? "text-cyan-300 drop-shadow-[0_0_8px_rgba(34,211,238,0.8)]"
-                              : "text-white/80",
-                          ].join(" ")}
-                        />
-                      </div>
+          {/* floating glows */}
+          <div className="absolute -left-14 top-8 h-28 w-28 rounded-full bg-fuchsia-500/20 blur-3xl animate-pulse" />
+          <div className="absolute -left-10 bottom-20 h-32 w-32 rounded-full bg-cyan-500/16 blur-3xl animate-pulse" />
 
-                      <span
-                        className={[
-                          "relative z-10 min-w-0 flex-1 truncate whitespace-nowrap text-[14px] font-medium",
-                          textClass,
-                        ].join(" ")}
-                      >
-                        {item.label}
-                      </span>
+          <div className="relative flex h-full flex-col">
+            {/* Logo block */}
+            <div className="px-3 pb-3 pt-4">
+              <div className="group relative flex h-[62px] items-center gap-3 overflow-hidden rounded-[26px] border border-white/12 bg-white/[0.08] px-3 shadow-[inset_0_1px_0_rgba(255,255,255,0.14),0_16px_40px_rgba(0,0,0,0.28)] backdrop-blur-2xl">
+                <div className="absolute inset-0 bg-gradient-to-br from-white/10 via-transparent to-white/5" />
+                <div className="absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-white/30 to-transparent" />
 
-                      <ChevronRight
-                        className={[
-                          "relative z-10 h-4 w-4",
-                          arrowClass,
-                          isActive ? "text-cyan-300" : "text-white/35",
-                        ].join(" ")}
-                      />
-                    </>
-                  )}
-                </NavLink>
-              ))}
-            </div>
-          </nav>
-
-          {/* sidebar control */}
-          <div className="p-3" ref={controlRef}>
-            <div className="relative">
-              <button
-                type="button"
-                onClick={() => setControlOpen((prev) => !prev)}
-                title="Sidebar boshqaruvi"
-                className="flex h-[56px] w-full items-center gap-3 rounded-[22px] border border-white/10 bg-white/[0.05] px-3 text-left backdrop-blur-xl shadow-[inset_0_1px_0_rgba(255,255,255,0.06),0_10px_30px_rgba(0,0,0,0.18)] transition-all duration-200 hover:bg-white/[0.08]"
-              >
-                <div className="relative flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-gradient-to-br from-fuchsia-500/25 to-cyan-400/20 text-white shadow-[0_0_18px_rgba(168,85,247,0.16)]">
-                  <PanelLeft className="h-5 w-5" />
+                <div className="relative flex h-11 w-11 shrink-0 items-center justify-center rounded-2xl border border-white/12 bg-gradient-to-br from-fuchsia-500/30 via-violet-500/20 to-cyan-400/25 shadow-[0_0_30px_rgba(168,85,247,0.22)]">
+                  <div className="absolute inset-0 rounded-2xl bg-gradient-to-br from-white/10 to-transparent" />
+                  <Gamepad2 className="relative h-5 w-5 text-white" />
                 </div>
 
                 <div className="min-w-0 flex-1 overflow-hidden">
-                  <p className={`truncate whitespace-nowrap text-[14px] font-medium text-white ${textClass}`}>
-                    Sidebar boshqaruvi
-                  </p>
-                  <p className={`truncate whitespace-nowrap text-[12px] text-white/60 ${textClass}`}>
-                    {sidebarMode === "expanded"
-                      ? "Har doim ochiq"
-                      : sidebarMode === "collapsed"
-                      ? "Har doim yopiq"
-                      : "Avto"}
+                  <h2
+                    className={`truncate whitespace-nowrap bg-gradient-to-r from-white via-fuchsia-100 to-cyan-100 bg-clip-text text-[16px] font-semibold text-transparent ${textClass}`}
+                  >
+                    Ridzhan SASS
+                  </h2>
+                  <p className={`truncate whitespace-nowrap text-[12px] text-white/55 ${textClass}`}>
+                    Admin panel
                   </p>
                 </div>
-              </button>
 
-              {controlOpen && (
-                <div className="absolute bottom-full left-0 mb-2 z-[80] w-[210px] overflow-hidden rounded-2xl border border-white/10 bg-[#1a1c22]/95 shadow-[0_18px_50px_rgba(0,0,0,0.45)] backdrop-blur-2xl">
-                  <div className="border-b border-white/10 px-4 py-3">
-                    <p className="text-[13px] font-medium text-white/85">
+                <Sparkles
+                  className={[
+                    "h-4 w-4 shrink-0 text-cyan-300/80 transition-all duration-300",
+                    isExpanded ? "opacity-100 scale-100" : "opacity-0 scale-75",
+                  ].join(" ")}
+                />
+              </div>
+            </div>
+
+            {/* Navigation */}
+            <nav className="flex-1 px-2.5 py-1">
+              <div className="space-y-2">
+                {navItems.map((item) => (
+                  <NavLink
+                    key={item.to}
+                    to={item.to}
+                    end={item.exact}
+                    title={item.label}
+                    className={({ isActive }) =>
+                      [
+                        "group relative flex h-[54px] items-center gap-3 overflow-hidden rounded-[22px] border px-3",
+                        "transition-all duration-300 ease-out",
+                        isActive
+                          ? "border-fuchsia-400/25 bg-white/[0.10] text-white shadow-[inset_0_1px_0_rgba(255,255,255,0.14),0_12px_32px_rgba(0,0,0,0.22),0_0_26px_rgba(168,85,247,0.12)] backdrop-blur-2xl"
+                          : "border-transparent bg-white/[0.03] text-white/72 hover:border-white/10 hover:bg-white/[0.07] hover:text-white hover:shadow-[inset_0_1px_0_rgba(255,255,255,0.08),0_8px_24px_rgba(0,0,0,0.16)]",
+                      ].join(" ")
+                    }
+                  >
+                    {({ isActive }) => (
+                      <>
+                        {isActive && (
+                          <>
+                            <div className="absolute inset-0 bg-[linear-gradient(90deg,rgba(217,70,239,0.14),rgba(139,92,246,0.08),rgba(34,211,238,0.12))]" />
+                            <div className="absolute inset-y-1 left-0 w-[3px] rounded-r-full bg-gradient-to-b from-fuchsia-400 via-violet-300 to-cyan-300 shadow-[0_0_16px_rgba(34,211,238,0.85)]" />
+                            <div className="absolute -left-6 top-1/2 h-14 w-14 -translate-y-1/2 rounded-full bg-fuchsia-500/14 blur-2xl" />
+                            <div className="absolute right-0 top-0 h-full w-16 bg-gradient-to-l from-cyan-400/8 to-transparent" />
+                          </>
+                        )}
+
+                        <div
+                          className={[
+                            "relative z-10 flex h-10 w-10 shrink-0 items-center justify-center rounded-[16px] transition-all duration-300",
+                            isActive
+                              ? "border border-white/10 bg-gradient-to-br from-fuchsia-500/20 via-violet-500/10 to-cyan-400/15 shadow-[0_0_20px_rgba(34,211,238,0.10)]"
+                              : "bg-white/[0.04] group-hover:bg-white/[0.08]",
+                          ].join(" ")}
+                        >
+                          <item.icon
+                            className={[
+                              "h-[18px] w-[18px] transition-all duration-300",
+                              isActive
+                                ? "text-cyan-300 drop-shadow-[0_0_8px_rgba(34,211,238,0.75)]"
+                                : "text-white/80 group-hover:text-white",
+                            ].join(" ")}
+                          />
+                        </div>
+
+                        <span
+                          className={[
+                            "relative z-10 min-w-0 flex-1 truncate whitespace-nowrap text-[14px] font-medium",
+                            textClass,
+                            isActive ? "text-white" : "",
+                          ].join(" ")}
+                        >
+                          {item.label}
+                        </span>
+
+                        <ChevronRight
+                          className={[
+                            "relative z-10 h-4 w-4",
+                            arrowClass,
+                            isActive
+                              ? "text-cyan-300 drop-shadow-[0_0_8px_rgba(34,211,238,0.6)]"
+                              : "text-white/35 group-hover:text-white/60",
+                          ].join(" ")}
+                        />
+                      </>
+                    )}
+                  </NavLink>
+                ))}
+              </div>
+            </nav>
+
+            {/* Bottom controller */}
+            <div className="p-3" ref={controlRef}>
+              <div className="relative">
+                <button
+                  type="button"
+                  onClick={() => setControlOpen((prev) => !prev)}
+                  title="Sidebar boshqaruvi"
+                  className="group relative flex h-[58px] w-full items-center gap-3 overflow-hidden rounded-[24px] border border-white/10 bg-white/[0.07] px-3 text-left shadow-[inset_0_1px_0_rgba(255,255,255,0.12),0_14px_36px_rgba(0,0,0,0.22)] backdrop-blur-2xl transition-all duration-300 hover:bg-white/[0.10]"
+                >
+                  <div className="absolute inset-0 bg-gradient-to-br from-white/8 via-transparent to-white/5" />
+                  <div className="absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-white/25 to-transparent" />
+
+                  <div className="relative flex h-10 w-10 shrink-0 items-center justify-center rounded-2xl border border-white/10 bg-gradient-to-br from-fuchsia-500/25 to-cyan-400/20 text-white shadow-[0_0_22px_rgba(168,85,247,0.14)]">
+                    <PanelLeft className="h-5 w-5" />
+                  </div>
+
+                  <div className="min-w-0 flex-1 overflow-hidden">
+                    <p className={`truncate whitespace-nowrap text-[14px] font-medium text-white ${textClass}`}>
                       Sidebar boshqaruvi
                     </p>
+                    <p className={`truncate whitespace-nowrap text-[12px] text-white/55 ${textClass}`}>
+                      {sidebarMode === "expanded"
+                        ? "Har doim ochiq"
+                        : sidebarMode === "collapsed"
+                        ? "Har doim yopiq"
+                        : "Avto"}
+                    </p>
                   </div>
+                </button>
 
-                  <div className="p-2">
-                    <button
-                      type="button"
-                      onClick={() => {
-                        setSidebarMode("expanded");
-                        setControlOpen(false);
-                      }}
-                      className="flex w-full items-center justify-between rounded-xl px-3 py-2.5 text-[14px] text-white/80 transition hover:bg-white/5"
-                    >
-                      <span>Har doim ochiq</span>
-                      {sidebarMode === "expanded" && (
-                        <span className="h-2.5 w-2.5 rounded-full bg-white/80" />
-                      )}
-                    </button>
+                {controlOpen && (
+                  <div className="absolute bottom-full left-0 z-[80] mb-3 w-[220px] overflow-hidden rounded-[24px] border border-white/10 bg-[#0b1222]/92 shadow-[0_24px_60px_rgba(0,0,0,0.48)] backdrop-blur-3xl">
+                    <div className="absolute inset-0 bg-[radial-gradient(circle_at_top_left,rgba(217,70,239,0.14),transparent_24%),radial-gradient(circle_at_bottom_right,rgba(34,211,238,0.12),transparent_24%)]" />
+                    <div className="absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-white/25 to-transparent" />
 
-                    <button
-                      type="button"
-                      onClick={() => {
-                        setSidebarMode("collapsed");
-                        setControlOpen(false);
-                      }}
-                      className="flex w-full items-center justify-between rounded-xl px-3 py-2.5 text-[14px] text-white/80 transition hover:bg-white/5"
-                    >
-                      <span>Har doim yopiq</span>
-                      {sidebarMode === "collapsed" && (
-                        <span className="h-2.5 w-2.5 rounded-full bg-white/80" />
-                      )}
-                    </button>
+                    <div className="relative border-b border-white/10 px-4 py-3">
+                      <p className="text-[13px] font-medium text-white/85">
+                        Sidebar boshqaruvi
+                      </p>
+                    </div>
 
-                    <button
-                      type="button"
-                      onClick={() => {
-                        setSidebarMode("auto");
-                        setControlOpen(false);
-                      }}
-                      className="flex w-full items-center justify-between rounded-xl px-3 py-2.5 text-[14px] text-white/80 transition hover:bg-white/5"
-                    >
-                      <span>Avto (hover)</span>
-                      {sidebarMode === "auto" && (
-                        <span className="h-2.5 w-2.5 rounded-full bg-white/80" />
-                      )}
-                    </button>
+                    <div className="relative p-2">
+                      <button
+                        type="button"
+                        onClick={() => {
+                          setSidebarMode("expanded");
+                          setControlOpen(false);
+                        }}
+                        className="flex w-full items-center justify-between rounded-2xl px-3 py-2.5 text-[14px] text-white/80 transition hover:bg-white/6"
+                      >
+                        <span>Har doim ochiq</span>
+                        {sidebarMode === "expanded" && (
+                          <span className="h-2.5 w-2.5 rounded-full bg-fuchsia-300 shadow-[0_0_10px_rgba(217,70,239,0.8)]" />
+                        )}
+                      </button>
+
+                      <button
+                        type="button"
+                        onClick={() => {
+                          setSidebarMode("collapsed");
+                          setControlOpen(false);
+                        }}
+                        className="flex w-full items-center justify-between rounded-2xl px-3 py-2.5 text-[14px] text-white/80 transition hover:bg-white/6"
+                      >
+                        <span>Har doim yopiq</span>
+                        {sidebarMode === "collapsed" && (
+                          <span className="h-2.5 w-2.5 rounded-full bg-cyan-300 shadow-[0_0_10px_rgba(34,211,238,0.8)]" />
+                        )}
+                      </button>
+
+                      <button
+                        type="button"
+                        onClick={() => {
+                          setSidebarMode("auto");
+                          setControlOpen(false);
+                        }}
+                        className="flex w-full items-center justify-between rounded-2xl px-3 py-2.5 text-[14px] text-white/80 transition hover:bg-white/6"
+                      >
+                        <span>Avto (hover)</span>
+                        {sidebarMode === "auto" && (
+                          <span className="h-2.5 w-2.5 rounded-full bg-white/80 shadow-[0_0_10px_rgba(255,255,255,0.45)]" />
+                        )}
+                      </button>
+                    </div>
                   </div>
-                </div>
-              )}
-            </div> 
+                )}
+              </div>
+            </div>
           </div>
         </div>
       </div>
