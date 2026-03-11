@@ -43,7 +43,7 @@ export function Dashboard() {
     <div className="space-y-6">
       {/* Page header */}
       <div>
-        <h1 className="text-3xl font-bold text-white mb-2">Dashboard</h1> <div className="bg-red-500 text-white p-6 text-2xl">Tailwind ishladi</div>
+        <h1 className="text-3xl font-bold text-white mb-2">Dashboard</h1>
         <p className="text-slate-400">
           Welcome back! Here's what's happening today.
         </p>
