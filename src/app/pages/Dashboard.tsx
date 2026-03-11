@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from "react"; 
+import { useMemo, useState } from "react";
 import { format } from "date-fns";
 import {
   CalendarCheck,
@@ -28,9 +28,9 @@ import {
 import {
   Dialog,
   DialogContent,
-  DialogDescription,
   DialogHeader,
   DialogTitle,
+  DialogDescription,
 } from "../components/ui/dialog";
 
 /* =========================
@@ -40,6 +40,7 @@ import {
 type RoomStatus = "free" | "booked" | "occupied" | "cleaning";
 type RoomKind = "playstation" | "pc";
 type BookingStatus = "confirmed" | "completed";
+
 type DurationPreset = "30" | "45" | "60" | "120" | "180";
 
 type Room = {
@@ -49,6 +50,7 @@ type Room = {
   deviceLabel: string;
   pricePerHour: number;
   status: RoomStatus;
+
   sessionStart?: Date | null;
   occupiedUntil?: Date | null;
   bookedFor?: Date | null;
@@ -206,11 +208,7 @@ const statusOrder: Record<RoomStatus, number> = {
   cleaning: 4,
 };
 
-const durationOptions: Array<{
-  value: DurationPreset;
-  label: string;
-  minutes: number;
-}> = [
+const durationOptions: Array<{ value: DurationPreset; label: string; minutes: number }> = [
   { value: "30", label: "30 minut", minutes: 30 },
   { value: "45", label: "45 minut", minutes: 45 },
   { value: "60", label: "1 soat", minutes: 60 },
@@ -252,8 +250,8 @@ function getDurationMinutes(value: DurationPreset) {
 
 function formatRemainingTime(end: Date | null | undefined) {
   if (!end) return "Cheklanmagan";
-
   const diff = end.getTime() - Date.now();
+
   if (diff <= 0) return "Vaqti tugagan";
 
   const totalMinutes = Math.floor(diff / 1000 / 60);
@@ -291,12 +289,14 @@ function GlassCard({
   return (
     <div
       className={[
-        "relative overflow-hidden rounded-[30px] border border-white/10 bg-white/[0.06] shadow-[0_20px_80px_rgba(0,0,0,0.45)] backdrop-blur-2xl",
+        "relative overflow-hidden rounded-[28px] border backdrop-blur-2xl transition-colors",
+        "border-slate-200/70 bg-white/70 shadow-[0_20px_80px_rgba(15,23,42,0.08)]",
+        "dark:border-white/10 dark:bg-white/[0.05] dark:shadow-[0_20px_80px_rgba(0,0,0,0.35)]",
         className,
       ].join(" ")}
     >
-      <div className="absolute inset-0 bg-gradient-to-br from-white/12 via-white/[0.04] to-transparent" />
-      <div className="absolute inset-x-0 top-0 h-[2px] bg-gradient-to-r from-fuchsia-400 via-violet-300 to-cyan-300" />
+      <div className="absolute inset-0 bg-gradient-to-br from-white/40 via-white/10 to-transparent dark:from-white/10 dark:via-white/[0.03] dark:to-transparent" />
+      <div className="absolute inset-x-0 top-0 h-px bg-gradient-to-r from-fuchsia-400/70 via-violet-300/50 to-cyan-300/70" />
       <div className="relative">{children}</div>
     </div>
   );
@@ -316,24 +316,26 @@ function StatCard({
   tone?: "cyan" | "green" | "red" | "blue" | "violet" | "yellow";
 }) {
   const toneMap: Record<string, string> = {
-    cyan: "from-cyan-500/30 to-cyan-400/10 text-cyan-300 border-cyan-400/20 shadow-[0_0_30px_rgba(34,211,238,0.12)]",
+    cyan: "from-cyan-500/25 to-cyan-400/10 text-cyan-500 dark:text-cyan-300 border-cyan-400/20",
     green:
-      "from-emerald-500/30 to-emerald-400/10 text-emerald-300 border-emerald-400/20 shadow-[0_0_30px_rgba(16,185,129,0.12)]",
-    red: "from-rose-500/30 to-rose-400/10 text-rose-300 border-rose-400/20 shadow-[0_0_30px_rgba(244,63,94,0.12)]",
-    blue: "from-blue-500/30 to-blue-400/10 text-blue-300 border-blue-400/20 shadow-[0_0_30px_rgba(59,130,246,0.12)]",
+      "from-emerald-500/25 to-emerald-400/10 text-emerald-500 dark:text-emerald-300 border-emerald-400/20",
+    red: "from-rose-500/25 to-rose-400/10 text-rose-500 dark:text-rose-300 border-rose-400/20",
+    blue: "from-blue-500/25 to-blue-400/10 text-blue-500 dark:text-blue-300 border-blue-400/20",
     violet:
-      "from-violet-500/30 to-fuchsia-400/10 text-fuchsia-200 border-fuchsia-400/20 shadow-[0_0_30px_rgba(217,70,239,0.12)]",
+      "from-violet-500/25 to-fuchsia-400/10 text-fuchsia-500 dark:text-fuchsia-200 border-fuchsia-400/20",
     yellow:
-      "from-amber-500/30 to-yellow-400/10 text-yellow-200 border-yellow-400/20 shadow-[0_0_30px_rgba(245,158,11,0.12)]",
+      "from-amber-500/25 to-yellow-400/10 text-yellow-500 dark:text-yellow-200 border-yellow-400/20",
   };
 
   return (
     <GlassCard className="p-5">
       <div className="flex items-start justify-between gap-4">
         <div>
-          <p className="text-sm text-slate-300/80">{title}</p>
-          <h3 className="mt-3 text-3xl font-bold text-white">{value}</h3>
-          {subtitle && <p className="mt-2 text-xs text-slate-400">{subtitle}</p>}
+          <p className="text-sm text-slate-600 dark:text-slate-300/80">{title}</p>
+          <h3 className="mt-3 text-3xl font-bold text-slate-900 dark:text-white">{value}</h3>
+          {subtitle && (
+            <p className="mt-2 text-xs text-emerald-600 dark:text-emerald-300">{subtitle}</p>
+          )}
         </div>
 
         <div
@@ -356,14 +358,14 @@ function StatusBadge({
   const map =
     type === "room"
       ? {
-          free: "border-emerald-400/25 bg-emerald-500/12 text-emerald-300",
-          booked: "border-blue-400/25 bg-blue-500/12 text-blue-300",
-          occupied: "border-rose-400/25 bg-rose-500/12 text-rose-300",
-          cleaning: "border-amber-400/25 bg-amber-500/12 text-amber-300",
+          free: "border-emerald-400/30 bg-emerald-500/15 text-emerald-700 dark:text-emerald-300",
+          booked: "border-blue-400/30 bg-blue-500/15 text-blue-700 dark:text-blue-300",
+          occupied: "border-rose-400/30 bg-rose-500/15 text-rose-700 dark:text-rose-300",
+          cleaning: "border-amber-400/30 bg-amber-500/15 text-amber-700 dark:text-amber-300",
         }
       : {
-          confirmed: "border-blue-400/25 bg-blue-500/12 text-blue-300",
-          completed: "border-slate-400/25 bg-slate-500/12 text-slate-300",
+          confirmed: "border-blue-400/30 bg-blue-500/15 text-blue-700 dark:text-blue-300",
+          completed: "border-slate-400/30 bg-slate-500/15 text-slate-700 dark:text-slate-300",
         };
 
   return (
@@ -374,29 +376,6 @@ function StatusBadge({
         ? getRoomStatusText(status as RoomStatus)
         : getBookingStatusText(status as BookingStatus)}
     </span>
-  );
-}
-
-function CyberDialogContent({
-  children,
-  className = "",
-}: {
-  children: React.ReactNode;
-  className?: string;
-}) {
-  return (
-    <DialogContent
-      className={[
-        "max-w-xl overflow-hidden rounded-[32px] border border-white/10 bg-[#09101f]/95 p-0 text-white shadow-[0_20px_80px_rgba(0,0,0,0.58)] backdrop-blur-2xl",
-        "before:pointer-events-none before:absolute before:inset-0 before:bg-gradient-to-br before:from-white/12 before:via-white/[0.04] before:to-transparent",
-        "[&>button]:right-5 [&>button]:top-5 [&>button]:rounded-full [&>button]:border [&>button]:border-white/10 [&>button]:bg-white/[0.05] [&>button]:p-1.5 [&>button]:text-slate-400 [&>button]:opacity-100 [&>button]:transition-all",
-        "[&>button:hover]:border-cyan-400/30 [&>button:hover]:bg-cyan-400/10 [&>button:hover]:text-cyan-300",
-        className,
-      ].join(" ")}
-    >
-      <div className="absolute inset-x-0 top-0 h-[2px] bg-gradient-to-r from-fuchsia-400 via-violet-300 to-cyan-300" />
-      <div className="relative">{children}</div>
-    </DialogContent>
   );
 }
 
@@ -425,8 +404,6 @@ export function Dashboard() {
   const [bookingVip, setBookingVip] = useState(false);
   const [bookingDuration, setBookingDuration] = useState<DurationPreset>("60");
 
-
-
   const todayStartedCount = useMemo(() => {
     return rooms.filter((room) => room.sessionStart && isToday(room.sessionStart)).length;
   }, [rooms]);
@@ -438,16 +415,16 @@ export function Dashboard() {
     [rooms]
   );
 
-  const bookedCount = useMemo(() => rooms.filter((r) => r.status === "booked").length, [rooms]);
+  const bookedCount = useMemo(
+    () => rooms.filter((r) => r.status === "booked").length,
+    [rooms]
+  );
 
   const totalRooms = rooms.length;
 
   const todayRevenue = useMemo(() => {
     const roomRevenue = rooms.reduce((sum, room) => {
-      if (room.status !== "occupied" || !room.sessionStart || !isToday(room.sessionStart)) {
-        return sum;
-      }
-
+      if (room.status !== "occupied" || !room.sessionStart || !isToday(room.sessionStart)) return sum;
       if (room.isVip) return sum;
       if (!room.occupiedUntil) return sum;
 
@@ -600,7 +577,6 @@ export function Dashboard() {
     };
 
     setBookings((prev) => [newBooking, ...prev]);
-
     setRooms((prev) =>
       prev.map((room) =>
         room.id === bookingRoomId
@@ -631,23 +607,23 @@ export function Dashboard() {
   }, [rooms, bookingRoomId, bookingVip, bookingDuration]);
 
   return (
-    <div className="relative min-h-screen overflow-hidden bg-[#050816] text-white">
-      {/* Background */}
-      <div className="absolute inset-0 bg-gradient-to-br from-[#16001f] via-[#050816] to-[#031a24]" />
-      <div className="absolute -left-24 top-[-80px] h-72 w-72 rounded-full bg-fuchsia-600/25 blur-3xl" />
-      <div className="absolute right-[-60px] top-1/4 h-80 w-80 rounded-full bg-cyan-500/20 blur-3xl" />
-      <div className="absolute bottom-[-80px] left-1/3 h-72 w-72 rounded-full bg-violet-500/20 blur-3xl" />
-      <div className="absolute inset-0 bg-[linear-gradient(rgba(255,255,255,0.03)_1px,transparent_1px),linear-gradient(90deg,rgba(255,255,255,0.03)_1px,transparent_1px)] bg-[size:42px_42px] opacity-20" />
+    <div className="min-h-screen bg-white text-slate-900 transition-colors dark:bg-[#050816] dark:text-white">
+      <div className="relative min-h-screen overflow-hidden p-4 sm:p-6">
+        {/* Background */}
+        <div className="pointer-events-none absolute inset-0 bg-gradient-to-br from-fuchsia-100/60 via-white to-cyan-100/50 dark:from-[#16001f] dark:via-[#050816] dark:to-[#031a24]" />
+        <div className="pointer-events-none absolute -left-24 top-[-80px] h-72 w-72 rounded-full bg-fuchsia-500/15 blur-3xl dark:bg-fuchsia-600/25" />
+        <div className="pointer-events-none absolute right-[-60px] top-1/4 h-80 w-80 rounded-full bg-cyan-400/15 blur-3xl dark:bg-cyan-500/20" />
+        <div className="pointer-events-none absolute bottom-[-80px] left-1/3 h-72 w-72 rounded-full bg-violet-400/15 blur-3xl dark:bg-violet-500/20" />
+        <div className="pointer-events-none absolute inset-0 bg-[linear-gradient(rgba(15,23,42,0.03)_1px,transparent_1px),linear-gradient(90deg,rgba(15,23,42,0.03)_1px,transparent_1px)] dark:bg-[linear-gradient(rgba(255,255,255,0.03)_1px,transparent_1px),linear-gradient(90deg,rgba(255,255,255,0.03)_1px,transparent_1px)] bg-[size:42px_42px] opacity-30 dark:opacity-20" />
 
-      <div className="relative min-h-screen p-4 sm:p-6">
-        <div className="space-y-6">
+        <div className="relative space-y-6">
           {/* Header */}
           <div className="flex flex-col gap-4 lg:flex-row lg:items-end lg:justify-between">
             <div>
-              <h1 className="bg-gradient-to-r from-white via-fuchsia-100 to-cyan-100 bg-clip-text text-3xl font-bold text-transparent sm:text-4xl">
+              <h1 className="bg-gradient-to-r from-slate-900 via-fuchsia-700 to-cyan-700 bg-clip-text text-3xl font-bold text-transparent dark:from-white dark:via-fuchsia-100 dark:to-cyan-100 sm:text-4xl">
                 Dashboard
               </h1>
-              <p className="mt-2 text-sm text-slate-300/80">
+              <p className="mt-2 text-sm text-slate-600 dark:text-slate-300/80">
                 Bugungi holat shu yerda. Kassaga nima tushdi, qaysi xona bo‘sh —
                 hammasi ko‘z oldingda.
               </p>
@@ -658,7 +634,7 @@ export function Dashboard() {
                 resetBookingForm();
                 setNewBookingModalOpen(true);
               }}
-              className="h-12 rounded-2xl border border-white/10 bg-gradient-to-r from-fuchsia-500 via-violet-400 to-cyan-400 px-5 font-semibold text-white shadow-[0_10px_30px_rgba(34,211,238,0.18)] transition-all duration-300 hover:scale-[1.01] hover:from-fuchsia-400 hover:via-violet-300 hover:to-cyan-300 hover:shadow-[0_16px_40px_rgba(217,70,239,0.28)]"
+              className="h-12 rounded-2xl border border-white/10 bg-gradient-to-r from-fuchsia-500 via-violet-400 to-cyan-400 px-5 font-semibold text-white shadow-[0_10px_30px_rgba(34,211,238,0.18)] transition-all duration-300 hover:scale-[1.01] hover:from-fuchsia-400 hover:via-violet-300 hover:to-cyan-300"
             >
               <Plus className="mr-2 h-4 w-4" />
               Buyurtma qo‘shish
@@ -701,7 +677,7 @@ export function Dashboard() {
             <StatCard
               title="Bugungi tushum"
               value={formatMoney(todayRevenue)}
-              subtitle="Kassa yomon emas"
+              subtitle="Hozircha yomon emas"
               icon={DollarSign}
               tone="yellow"
             />
@@ -711,12 +687,14 @@ export function Dashboard() {
           <GlassCard className="p-6">
             <div className="mb-6 flex items-center justify-between gap-4">
               <div>
-                <h2 className="text-2xl font-bold text-white">Xonalar holati</h2>
-                <p className="mt-1 text-sm text-slate-400">
+                <h2 className="text-2xl font-bold text-slate-900 dark:text-white">
+                  Xonalar holati
+                </h2>
+                <p className="mt-1 text-sm text-slate-600 dark:text-slate-400">
                   Avval bo‘sh, keyin buyurtirilgan, undan keyin band xonalar chiqadi.
                 </p>
               </div>
-              <TrendingUp className="h-5 w-5 text-fuchsia-300" />
+              <TrendingUp className="h-5 w-5 text-fuchsia-500 dark:text-fuchsia-300" />
             </div>
 
             <div className="grid grid-cols-1 gap-4 md:grid-cols-2 2xl:grid-cols-4">
@@ -725,40 +703,47 @@ export function Dashboard() {
                   key={room.id}
                   type="button"
                   onClick={() => openRoom(room)}
-                  className="group relative overflow-hidden rounded-[24px] border border-white/10 bg-white/[0.04] p-5 text-left backdrop-blur-xl transition-all duration-300 hover:-translate-y-0.5 hover:border-fuchsia-400/30 hover:bg-white/[0.07] hover:shadow-[0_18px_40px_rgba(168,85,247,0.14)]"
+                  className={[
+                    "group relative overflow-hidden rounded-[24px] border p-5 text-left backdrop-blur-xl transition-all duration-300",
+                    "border-slate-200/70 bg-white/50 hover:border-fuchsia-300/60 hover:bg-white/70 hover:shadow-[0_12px_40px_rgba(168,85,247,0.08)]",
+                    "dark:border-white/10 dark:bg-white/[0.04] dark:hover:border-fuchsia-400/30 dark:hover:bg-white/[0.06] dark:hover:shadow-[0_12px_40px_rgba(168,85,247,0.12)]",
+                  ].join(" ")}
                 >
-                  <div className="absolute inset-0 bg-gradient-to-br from-white/10 via-transparent to-transparent" />
-                  <div className="absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-fuchsia-400/60 to-cyan-400/60 opacity-70" />
+                  <div className="absolute inset-0 bg-gradient-to-br from-white/40 via-transparent to-transparent opacity-70 dark:from-white/8" />
 
                   <div className="relative flex items-start justify-between gap-3">
                     <div>
-                      <h3 className="text-lg font-semibold text-white">{room.name}</h3>
-                      <p className="mt-1 text-xs uppercase tracking-[0.16em] text-slate-400">
+                      <h3 className="text-lg font-semibold text-slate-900 dark:text-white">
+                        {room.name}
+                      </h3>
+                      <p className="mt-1 text-xs uppercase tracking-[0.16em] text-slate-500 dark:text-slate-400">
                         {room.deviceLabel}
                       </p>
                     </div>
 
-                    <div className="flex h-11 w-11 items-center justify-center rounded-2xl border border-white/10 bg-white/[0.06] shadow-[inset_0_1px_0_rgba(255,255,255,0.08)]">
+                    <div className="flex h-11 w-11 items-center justify-center rounded-2xl border border-slate-200/70 bg-white/60 dark:border-white/10 dark:bg-white/10">
                       {room.kind === "pc" ? (
-                        <Monitor className="h-5 w-5 text-cyan-300" />
+                        <Monitor className="h-5 w-5 text-cyan-500 dark:text-cyan-300" />
                       ) : (
-                        <Gamepad2 className="h-5 w-5 text-fuchsia-300" />
+                        <Gamepad2 className="h-5 w-5 text-fuchsia-500 dark:text-fuchsia-300" />
                       )}
                     </div>
                   </div>
 
                   <div className="relative mt-4 flex items-center justify-between">
                     <StatusBadge status={room.status} type="room" />
-                    <p className="text-sm font-medium text-slate-200">
+                    <p className="text-sm font-medium text-slate-700 dark:text-slate-300">
                       SAR {room.pricePerHour}/soat
                     </p>
                   </div>
 
                   {room.status === "occupied" && (
-                    <div className="relative mt-3 space-y-1 text-sm text-slate-400">
+                    <div className="relative mt-3 space-y-1 text-sm text-slate-600 dark:text-slate-400">
                       {room.isVip ? (
                         <>
-                          <p className="font-medium text-fuchsia-300">VIP</p>
+                          <p className="font-medium text-fuchsia-600 dark:text-fuchsia-300">
+                            VIP
+                          </p>
                           {room.sessionStart && (
                             <p>Boshlangan: {format(room.sessionStart, "HH:mm")}</p>
                           )}
@@ -778,19 +763,19 @@ export function Dashboard() {
                   )}
 
                   {room.status === "booked" && room.bookedFor && (
-                    <p className="relative mt-3 text-sm text-slate-400">
+                    <p className="relative mt-3 text-sm text-slate-600 dark:text-slate-400">
                       Kelishi kutilmoqda: {format(room.bookedFor, "HH:mm")}
                     </p>
                   )}
 
                   {room.status === "free" && (
-                    <p className="relative mt-3 text-sm text-emerald-300">
+                    <p className="relative mt-3 text-sm text-emerald-600 dark:text-emerald-300">
                       Hozir odam qo‘yish mumkin
                     </p>
                   )}
 
                   {room.status === "cleaning" && (
-                    <p className="relative mt-3 text-sm text-amber-300">
+                    <p className="relative mt-3 text-sm text-amber-600 dark:text-amber-300">
                       Hozircha texnik pauza
                     </p>
                   )}
@@ -803,7 +788,7 @@ export function Dashboard() {
                 <Button
                   variant="outline"
                   onClick={() => setShowAllRooms((prev) => !prev)}
-                  className="rounded-2xl border-white/10 bg-white/[0.05] text-slate-200 hover:bg-white/[0.08] hover:text-white"
+                  className="rounded-2xl border-slate-200 bg-white/70 text-slate-700 hover:bg-white dark:border-white/10 dark:bg-white/5 dark:text-slate-200 dark:hover:bg-white/10 dark:hover:text-white"
                 >
                   {showAllRooms ? "Kamroq ko‘rish" : "Ko‘proq ko‘rish"}
                 </Button>
@@ -815,24 +800,26 @@ export function Dashboard() {
           <GlassCard className="p-6">
             <div className="mb-6 flex items-center justify-between gap-4">
               <div>
-                <h2 className="text-2xl font-bold text-white">Buyurtmalar ro‘yxati</h2>
-                <p className="mt-1 text-sm text-slate-400">
+                <h2 className="text-2xl font-bold text-slate-900 dark:text-white">
+                  Buyurtmalar ro‘yxati
+                </h2>
+                <p className="mt-1 text-sm text-slate-600 dark:text-slate-400">
                   Bu yerda faqat oldindan bronlar turadi.
                 </p>
               </div>
             </div>
 
-            <div className="overflow-x-auto rounded-2xl border border-white/10 bg-black/20">
+            <div className="overflow-x-auto rounded-2xl border border-slate-200 bg-white/40 dark:border-white/10 dark:bg-black/10">
               <Table>
                 <TableHeader>
-                  <TableRow className="border-white/10 hover:bg-white/[0.03]">
-                    <TableHead className="text-slate-300">Booking ID</TableHead>
-                    <TableHead className="text-slate-300">Room</TableHead>
-                    <TableHead className="text-slate-300">Ism</TableHead>
-                    <TableHead className="text-slate-300">Telefon</TableHead>
-                    <TableHead className="text-slate-300">Vaqt</TableHead>
-                    <TableHead className="text-slate-300">Amount</TableHead>
-                    <TableHead className="text-slate-300">Status</TableHead>
+                  <TableRow className="border-slate-200 hover:bg-slate-50 dark:border-white/10 dark:hover:bg-white/[0.03]">
+                    <TableHead className="text-slate-600 dark:text-slate-300">Booking ID</TableHead>
+                    <TableHead className="text-slate-600 dark:text-slate-300">Room</TableHead>
+                    <TableHead className="text-slate-600 dark:text-slate-300">Ism</TableHead>
+                    <TableHead className="text-slate-600 dark:text-slate-300">Telefon</TableHead>
+                    <TableHead className="text-slate-600 dark:text-slate-300">Vaqt</TableHead>
+                    <TableHead className="text-slate-600 dark:text-slate-300">Amount</TableHead>
+                    <TableHead className="text-slate-600 dark:text-slate-300">Status</TableHead>
                   </TableRow>
                 </TableHeader>
 
@@ -841,12 +828,23 @@ export function Dashboard() {
                     const room = rooms.find((r) => r.id === booking.roomId);
 
                     return (
-                      <TableRow key={booking.id} className="border-white/10 hover:bg-white/[0.03]">
-                        <TableCell className="text-slate-200">#{booking.id}</TableCell>
-                        <TableCell className="text-slate-200">{room?.name ?? "-"}</TableCell>
-                        <TableCell className="text-slate-200">{booking.clientName}</TableCell>
-                        <TableCell className="text-slate-200">{booking.phone}</TableCell>
-                        <TableCell className="text-slate-200">
+                      <TableRow
+                        key={booking.id}
+                        className="border-slate-200 hover:bg-slate-50 dark:border-white/10 dark:hover:bg-white/[0.03]"
+                      >
+                        <TableCell className="text-slate-800 dark:text-slate-200">
+                          #{booking.id}
+                        </TableCell>
+                        <TableCell className="text-slate-800 dark:text-slate-200">
+                          {room?.name ?? "-"}
+                        </TableCell>
+                        <TableCell className="text-slate-800 dark:text-slate-200">
+                          {booking.clientName}
+                        </TableCell>
+                        <TableCell className="text-slate-800 dark:text-slate-200">
+                          {booking.phone}
+                        </TableCell>
+                        <TableCell className="text-slate-800 dark:text-slate-200">
                           {format(booking.startTime, "HH:mm")} -{" "}
                           {booking.isVip
                             ? "VIP"
@@ -854,7 +852,7 @@ export function Dashboard() {
                             ? format(booking.endTime, "HH:mm")
                             : "-"}
                         </TableCell>
-                        <TableCell className="text-slate-200">
+                        <TableCell className="text-slate-800 dark:text-slate-200">
                           {booking.isVip ? "VIP" : formatMoney(booking.totalAmount)}
                         </TableCell>
                         <TableCell>
@@ -872,19 +870,22 @@ export function Dashboard() {
 
       {/* SESSION START MODAL */}
       <Dialog open={sessionModalOpen} onOpenChange={setSessionModalOpen}>
-        <CyberDialogContent>
-          <div className="p-6 sm:p-7">
+        <DialogContent className="max-w-xl rounded-[32px] border border-slate-200 bg-white/95 p-0 text-slate-900 shadow-[0_20px_80px_rgba(15,23,42,0.18)] backdrop-blur-2xl dark:border-white/10 dark:bg-[#0a1020]/95 dark:text-white dark:shadow-[0_20px_80px_rgba(0,0,0,0.55)]">
+          <div className="absolute inset-0 bg-gradient-to-br from-white/50 via-transparent to-transparent dark:from-white/10 dark:via-transparent dark:to-transparent" />
+          <div className="h-[2px] w-full bg-gradient-to-r from-fuchsia-400 via-violet-300 to-cyan-300" />
+
+          <div className="relative p-6 sm:p-7">
             <DialogHeader>
-              <DialogTitle className="text-2xl font-bold text-white">
+              <DialogTitle className="text-2xl font-bold text-slate-900 dark:text-white">
                 {selectedRoom?.name}
               </DialogTitle>
-              <DialogDescription className="text-slate-400">
+              <DialogDescription className="text-slate-600 dark:text-slate-400">
                 Hona bo‘shatilgan ekan, endi odam qo‘yish mumkin.
               </DialogDescription>
             </DialogHeader>
 
             <div className="mt-6 space-y-5">
-              <div className="flex items-center gap-3 rounded-2xl border border-white/10 bg-white/[0.05] p-4">
+              <div className="flex items-center gap-3 rounded-2xl border border-slate-200 bg-slate-50/70 p-4 dark:border-white/10 dark:bg-white/[0.05]">
                 <input
                   id="session-vip"
                   type="checkbox"
@@ -892,14 +893,14 @@ export function Dashboard() {
                   onChange={(e) => setSessionVip(e.target.checked)}
                   className="h-4 w-4 accent-fuchsia-500"
                 />
-                <Label htmlFor="session-vip" className="cursor-pointer text-sm text-slate-200">
+                <Label htmlFor="session-vip" className="cursor-pointer text-sm">
                   VIP qilish — vaqt cheklanmaydi
                 </Label>
               </div>
 
               {!sessionVip && (
                 <div className="space-y-2">
-                  <Label className="text-xs uppercase tracking-[0.18em] text-slate-300/80">
+                  <Label className="text-xs uppercase tracking-[0.18em] text-slate-500 dark:text-slate-200/80">
                     Davomiyligi
                   </Label>
 
@@ -915,8 +916,8 @@ export function Dashboard() {
                           className={[
                             "rounded-2xl border px-3 py-3 text-sm font-medium transition-all",
                             isActive
-                              ? "border-fuchsia-400/40 bg-gradient-to-r from-fuchsia-500/20 to-cyan-500/20 text-white shadow-[0_0_30px_rgba(217,70,239,0.15)]"
-                              : "border-white/10 bg-white/[0.05] text-slate-300 hover:bg-white/[0.08]",
+                              ? "border-fuchsia-400/40 bg-gradient-to-r from-fuchsia-500/15 to-cyan-500/15 text-fuchsia-600 dark:text-fuchsia-200"
+                              : "border-slate-200 bg-white/70 text-slate-700 hover:bg-slate-50 dark:border-white/10 dark:bg-white/5 dark:text-slate-200 dark:hover:bg-white/10",
                           ].join(" ")}
                         >
                           {item.label}
@@ -927,22 +928,24 @@ export function Dashboard() {
                 </div>
               )}
 
-              <div className="rounded-2xl border border-white/10 bg-white/[0.04] p-4 text-sm text-slate-300">
+              <div className="rounded-2xl border border-slate-200 bg-slate-50/70 p-4 text-sm text-slate-700 dark:border-white/10 dark:bg-white/[0.04] dark:text-slate-300">
                 <p>
                   Qurilma turi:{" "}
-                  <span className="font-semibold text-white">
+                  <span className="font-semibold text-slate-900 dark:text-white">
                     {selectedRoom?.deviceLabel}
                   </span>
                 </p>
                 <p className="mt-1">
                   Soatbay narx:{" "}
-                  <span className="font-semibold text-white">
+                  <span className="font-semibold text-slate-900 dark:text-white">
                     SAR {selectedRoom?.pricePerHour ?? 0}
                   </span>
                 </p>
                 <p className="mt-1">
                   Session narxi:{" "}
-                  <span className="font-semibold text-white">{selectedRoomAmount}</span>
+                  <span className="font-semibold text-slate-900 dark:text-white">
+                    {selectedRoomAmount}
+                  </span>
                 </p>
               </div>
 
@@ -951,48 +954,53 @@ export function Dashboard() {
                   type="button"
                   variant="outline"
                   onClick={() => setSessionModalOpen(false)}
-                  className="h-12 rounded-2xl border-white/10 bg-white/[0.05] text-slate-200 hover:bg-white/[0.08]"
+                  className="h-12 rounded-2xl border-slate-200 bg-white text-slate-700 hover:bg-slate-50 dark:border-white/10 dark:bg-white/5 dark:text-slate-200 dark:hover:bg-white/10"
                 >
                   Bekor qilish
                 </Button>
                 <Button
                   type="button"
                   onClick={handleCreateSession}
-                  className="h-12 rounded-2xl border border-white/10 bg-gradient-to-r from-fuchsia-500 via-violet-400 to-cyan-400 font-semibold text-white transition-all duration-300 hover:from-fuchsia-400 hover:via-violet-300 hover:to-cyan-300 hover:shadow-[0_16px_40px_rgba(217,70,239,0.28)]"
+                  className="h-12 rounded-2xl border border-white/10 bg-gradient-to-r from-fuchsia-500 via-violet-400 to-cyan-400 font-semibold text-white hover:from-fuchsia-400 hover:via-violet-300 hover:to-cyan-300"
                 >
                   Session boshlash
                 </Button>
               </div>
             </div>
           </div>
-        </CyberDialogContent>
+        </DialogContent>
       </Dialog>
 
       {/* OCCUPIED ROOM MODAL */}
       <Dialog open={occupiedModalOpen} onOpenChange={setOccupiedModalOpen}>
-        <CyberDialogContent>
-          <div className="p-6 sm:p-7">
+        <DialogContent className="max-w-xl rounded-[32px] border border-slate-200 bg-white/95 p-0 text-slate-900 shadow-[0_20px_80px_rgba(15,23,42,0.18)] backdrop-blur-2xl dark:border-white/10 dark:bg-[#0a1020]/95 dark:text-white dark:shadow-[0_20px_80px_rgba(0,0,0,0.55)]">
+          <div className="absolute inset-0 bg-gradient-to-br from-white/50 via-transparent to-transparent dark:from-white/10 dark:via-transparent dark:to-transparent" />
+          <div className="h-[2px] w-full bg-gradient-to-r from-fuchsia-400 via-violet-300 to-cyan-300" />
+
+          <div className="relative p-6 sm:p-7">
             <DialogHeader>
-              <DialogTitle className="text-2xl font-bold text-white">
+              <DialogTitle className="text-2xl font-bold text-slate-900 dark:text-white">
                 {selectedRoom?.name}
               </DialogTitle>
-              <DialogDescription className="text-slate-400">
+              <DialogDescription className="text-slate-600 dark:text-slate-400">
                 Hozir xona band. Shu yerdan tugatish mumkin.
               </DialogDescription>
             </DialogHeader>
 
             <div className="mt-6 space-y-5">
-              <div className="rounded-2xl border border-white/10 bg-white/[0.04] p-4 text-sm text-slate-300">
+              <div className="rounded-2xl border border-slate-200 bg-slate-50/70 p-4 text-sm text-slate-700 dark:border-white/10 dark:bg-white/[0.04] dark:text-slate-300">
                 <p>
                   Qurilma turi:{" "}
-                  <span className="font-semibold text-white">
+                  <span className="font-semibold text-slate-900 dark:text-white">
                     {selectedRoom?.deviceLabel}
                   </span>
                 </p>
 
                 {selectedRoom?.isVip ? (
                   <>
-                    <p className="mt-2 font-semibold text-fuchsia-300">VIP session</p>
+                    <p className="mt-2 font-semibold text-fuchsia-600 dark:text-fuchsia-300">
+                      VIP session
+                    </p>
                     {selectedRoom.sessionStart && (
                       <p className="mt-1">
                         Boshlangan: {format(selectedRoom.sessionStart, "HH:mm")}
@@ -1019,7 +1027,7 @@ export function Dashboard() {
                   type="button"
                   variant="outline"
                   onClick={() => setOccupiedModalOpen(false)}
-                  className="h-12 rounded-2xl border-white/10 bg-white/[0.05] text-slate-200 hover:bg-white/[0.08]"
+                  className="h-12 rounded-2xl border-slate-200 bg-white text-slate-700 hover:bg-slate-50 dark:border-white/10 dark:bg-white/5 dark:text-slate-200 dark:hover:bg-white/10"
                 >
                   Ortga
                 </Button>
@@ -1033,25 +1041,28 @@ export function Dashboard() {
               </div>
             </div>
           </div>
-        </CyberDialogContent>
+        </DialogContent>
       </Dialog>
 
       {/* NEW BOOKING MODAL */}
       <Dialog open={newBookingModalOpen} onOpenChange={setNewBookingModalOpen}>
-        <CyberDialogContent>
-          <div className="p-6 sm:p-7">
+        <DialogContent className="max-w-xl rounded-[32px] border border-slate-200 bg-white/95 p-0 text-slate-900 shadow-[0_20px_80px_rgba(15,23,42,0.18)] backdrop-blur-2xl dark:border-white/10 dark:bg-[#0a1020]/95 dark:text-white dark:shadow-[0_20px_80px_rgba(0,0,0,0.55)]">
+          <div className="absolute inset-0 bg-gradient-to-br from-white/50 via-transparent to-transparent dark:from-white/10 dark:via-transparent dark:to-transparent" />
+          <div className="h-[2px] w-full bg-gradient-to-r from-fuchsia-400 via-violet-300 to-cyan-300" />
+
+          <div className="relative p-6 sm:p-7">
             <DialogHeader>
-              <DialogTitle className="text-2xl font-bold text-white">
+              <DialogTitle className="text-2xl font-bold text-slate-900 dark:text-white">
                 Yangi buyurtma qo‘shish
               </DialogTitle>
-              <DialogDescription className="text-slate-400">
+              <DialogDescription className="text-slate-600 dark:text-slate-400">
                 Oldindan bron qilish uchun ism va telefon ham yoziladi.
               </DialogDescription>
             </DialogHeader>
 
             <div className="mt-6 space-y-5">
               <div className="space-y-2">
-                <Label className="text-xs uppercase tracking-[0.18em] text-slate-300/80">
+                <Label className="text-xs uppercase tracking-[0.18em] text-slate-500 dark:text-slate-200/80">
                   Ism
                 </Label>
                 <div className="relative">
@@ -1060,13 +1071,13 @@ export function Dashboard() {
                     value={bookingClientName}
                     onChange={(e) => setBookingClientName(e.target.value)}
                     placeholder="Mijoz ismi"
-                    className="h-12 rounded-2xl border border-white/10 bg-white/[0.06] pl-11 text-slate-100 placeholder:text-slate-400 shadow-[inset_0_1px_0_rgba(255,255,255,0.08)] backdrop-blur-xl transition-all duration-300 focus:border-fuchsia-400/60 focus:bg-white/[0.08] focus:ring-2 focus:ring-fuchsia-400/20"
+                    className="h-12 rounded-2xl border border-slate-200 bg-white/80 pl-11 text-slate-900 placeholder:text-slate-400 focus:border-fuchsia-400/60 focus:ring-2 focus:ring-fuchsia-400/20 dark:border-white/10 dark:bg-white/8 dark:text-slate-100 dark:placeholder:text-slate-400"
                   />
                 </div>
               </div>
 
               <div className="space-y-2">
-                <Label className="text-xs uppercase tracking-[0.18em] text-slate-300/80">
+                <Label className="text-xs uppercase tracking-[0.18em] text-slate-500 dark:text-slate-200/80">
                   Telefon raqami
                 </Label>
                 <div className="relative">
@@ -1075,22 +1086,26 @@ export function Dashboard() {
                     value={bookingPhone}
                     onChange={(e) => setBookingPhone(e.target.value)}
                     placeholder="+966 5X XXX XX XX"
-                    className="h-12 rounded-2xl border border-white/10 bg-white/[0.06] pl-11 text-slate-100 placeholder:text-slate-400 shadow-[inset_0_1px_0_rgba(255,255,255,0.08)] backdrop-blur-xl transition-all duration-300 focus:border-cyan-400/60 focus:bg-white/[0.08] focus:ring-2 focus:ring-cyan-400/20"
+                    className="h-12 rounded-2xl border border-slate-200 bg-white/80 pl-11 text-slate-900 placeholder:text-slate-400 focus:border-fuchsia-400/60 focus:ring-2 focus:ring-fuchsia-400/20 dark:border-white/10 dark:bg-white/8 dark:text-slate-100 dark:placeholder:text-slate-400"
                   />
                 </div>
               </div>
 
               <div className="space-y-2">
-                <Label className="text-xs uppercase tracking-[0.18em] text-slate-300/80">
+                <Label className="text-xs uppercase tracking-[0.18em] text-slate-500 dark:text-slate-200/80">
                   Xona
                 </Label>
                 <select
                   value={bookingRoomId}
                   onChange={(e) => setBookingRoomId(e.target.value)}
-                  className="h-12 w-full rounded-2xl border border-white/10 bg-white/[0.06] px-4 text-slate-100 outline-none transition-all duration-300 focus:border-cyan-400/60 focus:ring-2 focus:ring-cyan-400/20"
+                  className="h-12 w-full rounded-2xl border border-slate-200 bg-white/80 px-4 text-slate-900 outline-none focus:border-cyan-400/60 focus:ring-2 focus:ring-cyan-400/20 dark:border-white/10 dark:bg-white/8 dark:text-slate-100"
                 >
                   {freeOrBookedRooms.map((room) => (
-                    <option key={room.id} value={room.id} className="bg-[#0b1120] text-white">
+                    <option
+                      key={room.id}
+                      value={room.id}
+                      className="bg-white text-slate-900 dark:bg-slate-900 dark:text-white"
+                    >
                       {room.name} — {room.deviceLabel}
                     </option>
                   ))}
@@ -1098,18 +1113,18 @@ export function Dashboard() {
               </div>
 
               <div className="space-y-2">
-                <Label className="text-xs uppercase tracking-[0.18em] text-slate-300/80">
+                <Label className="text-xs uppercase tracking-[0.18em] text-slate-500 dark:text-slate-200/80">
                   Boshlanish vaqti
                 </Label>
                 <Input
                   type="time"
                   value={bookingStart}
                   onChange={(e) => setBookingStart(e.target.value)}
-                  className="h-12 rounded-2xl border border-white/10 bg-white/[0.06] text-slate-100 shadow-[inset_0_1px_0_rgba(255,255,255,0.08)] backdrop-blur-xl transition-all duration-300 focus:border-cyan-400/60 focus:bg-white/[0.08] focus:ring-2 focus:ring-cyan-400/20"
+                  className="h-12 rounded-2xl border border-slate-200 bg-white/80 text-slate-900 focus:border-cyan-400/60 focus:ring-2 focus:ring-cyan-400/20 dark:border-white/10 dark:bg-white/8 dark:text-slate-100"
                 />
               </div>
 
-              <div className="flex items-center gap-3 rounded-2xl border border-white/10 bg-white/[0.05] p-4">
+              <div className="flex items-center gap-3 rounded-2xl border border-slate-200 bg-slate-50/70 p-4 dark:border-white/10 dark:bg-white/[0.05]">
                 <input
                   id="booking-vip"
                   type="checkbox"
@@ -1117,14 +1132,14 @@ export function Dashboard() {
                   onChange={(e) => setBookingVip(e.target.checked)}
                   className="h-4 w-4 accent-fuchsia-500"
                 />
-                <Label htmlFor="booking-vip" className="cursor-pointer text-sm text-slate-200">
+                <Label htmlFor="booking-vip" className="cursor-pointer text-sm">
                   VIP bron — tugash vaqti yo‘q
                 </Label>
               </div>
 
               {!bookingVip && (
                 <div className="space-y-2">
-                  <Label className="text-xs uppercase tracking-[0.18em] text-slate-300/80">
+                  <Label className="text-xs uppercase tracking-[0.18em] text-slate-500 dark:text-slate-200/80">
                     Davomiyligi
                   </Label>
 
@@ -1140,8 +1155,8 @@ export function Dashboard() {
                           className={[
                             "rounded-2xl border px-3 py-3 text-sm font-medium transition-all",
                             isActive
-                              ? "border-fuchsia-400/40 bg-gradient-to-r from-fuchsia-500/20 to-cyan-500/20 text-white shadow-[0_0_30px_rgba(217,70,239,0.15)]"
-                              : "border-white/10 bg-white/[0.05] text-slate-300 hover:bg-white/[0.08]",
+                              ? "border-fuchsia-400/40 bg-gradient-to-r from-fuchsia-500/15 to-cyan-500/15 text-fuchsia-600 dark:text-fuchsia-200"
+                              : "border-slate-200 bg-white/70 text-slate-700 hover:bg-slate-50 dark:border-white/10 dark:bg-white/5 dark:text-slate-200 dark:hover:bg-white/10",
                           ].join(" ")}
                         >
                           {item.label}
@@ -1152,10 +1167,12 @@ export function Dashboard() {
                 </div>
               )}
 
-              <div className="rounded-2xl border border-white/10 bg-white/[0.04] p-4 text-sm text-slate-300">
+              <div className="rounded-2xl border border-slate-200 bg-slate-50/70 p-4 text-sm text-slate-700 dark:border-white/10 dark:bg-white/[0.04] dark:text-slate-300">
                 <p>
                   Bron summasi:{" "}
-                  <span className="font-semibold text-white">{selectedBookingAmount}</span>
+                  <span className="font-semibold text-slate-900 dark:text-white">
+                    {selectedBookingAmount}
+                  </span>
                 </p>
               </div>
 
@@ -1164,21 +1181,21 @@ export function Dashboard() {
                   type="button"
                   variant="outline"
                   onClick={() => setNewBookingModalOpen(false)}
-                  className="h-12 rounded-2xl border-white/10 bg-white/[0.05] text-slate-200 hover:bg-white/[0.08]"
+                  className="h-12 rounded-2xl border-slate-200 bg-white text-slate-700 hover:bg-slate-50 dark:border-white/10 dark:bg-white/5 dark:text-slate-200 dark:hover:bg-white/10"
                 >
                   Bekor qilish
                 </Button>
                 <Button
                   type="button"
                   onClick={handleCreatePreBooking}
-                  className="h-12 rounded-2xl border border-white/10 bg-gradient-to-r from-fuchsia-500 via-violet-400 to-cyan-400 font-semibold text-white transition-all duration-300 hover:from-fuchsia-400 hover:via-violet-300 hover:to-cyan-300 hover:shadow-[0_16px_40px_rgba(217,70,239,0.28)]"
+                  className="h-12 rounded-2xl border border-white/10 bg-gradient-to-r from-fuchsia-500 via-violet-400 to-cyan-400 font-semibold text-white hover:from-fuchsia-400 hover:via-violet-300 hover:to-cyan-300"
                 >
                   Bron yaratish
                 </Button>
               </div>
             </div>
           </div>
-        </CyberDialogContent>
+        </DialogContent> 
       </Dialog>
     </div>
   );
