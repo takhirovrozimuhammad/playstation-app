@@ -1,4 +1,27 @@
-@import "tailwindcss";
+@import "./fonts.css";
+@import "./theme.css";
+@import "./custom.css";
+
+html,
+body,
+#root {
+  min-height: 100%;
+}
+
+html {
+  color-scheme: dark;
+}
+
+body {
+  margin: 0;
+  background: #050816;
+  color: white;
+  font-family: Inter, sans-serif;
+}
+
+* {
+  box-sizing: border-box;
+}
 
 @theme {
   --font-sans: Inter, sans-serif;
