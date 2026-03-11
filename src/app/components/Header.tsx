@@ -30,7 +30,7 @@ export function Header() {
   };
 
   return (
-    <header className="fixed inset-x-0 top-0 z-30 h-[62px]">
+    <header className="fixed inset-x-0 top-0 z-30 h-[72px]">
       <div className="relative h-full border-b border-cyan-400/15 bg-[#07101f]/58 backdrop-blur-3xl">
         {/* base dark layer */}
         <div className="absolute inset-0 bg-[linear-gradient(180deg,rgba(7,16,31,0.96),rgba(7,16,31,0.78))]" />
