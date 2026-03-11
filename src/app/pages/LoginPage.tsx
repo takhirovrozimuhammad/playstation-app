@@ -3,92 +3,141 @@ import { useNavigate } from "react-router";
 import { Button } from "../components/ui/button";
 import { Input } from "../components/ui/input";
 import { Label } from "../components/ui/label";
-import { Gamepad2, Lock, User } from "lucide-react";
+import { Gamepad2, Lock, User, Eye, EyeOff } from "lucide-react";
 
 export function LoginPage() {
   const navigate = useNavigate();
+
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
+  const [showPassword, setShowPassword] = useState(false);
+  const [error, setError] = useState("");
 
   const handleLogin = (e: React.FormEvent) => {
     e.preventDefault();
-    // Mock authentication - in production, this would call an API
-    navigate("/");
+
+    if (username === "tharih" && password === "hacker") {
+      setError("");
+      navigate("/");
+    } else {
+      setError("Login yoki parol noto‘g‘ri");
+    }
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-950 via-purple-950 to-slate-950 flex items-center justify-center p-4">
-      {/* Background effects */}
-      <div className="absolute inset-0 bg-[url('data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNjAiIGhlaWdodD0iNjAiIHZpZXdCb3g9IjAgMCA2MCA2MCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48ZyBmaWxsPSJub25lIiBmaWxsLXJ1bGU9ImV2ZW5vZGQiPjxnIGZpbGw9IiM4YjVjZjYiIGZpbGwtb3BhY2l0eT0iMC4wNSI+PHBhdGggZD0iTTM2IDE2YzAgMi4yMS0xLjc5IDQtNCA0cy00LTEuNzktNC00IDEuNzktNCA0LTQgNCAxLjc5IDQgNHptLTQgMjhjLTIuMjEgMC00LTEuNzktNC00czEuNzktNCA0LTQgNCAxLjc5IDQgNC0xLjc5IDQtNCA0eiIvPjwvZz48L2c+PC9zdmc+')] opacity-20"></div>
-      
+    <div className="relative min-h-screen overflow-hidden bg-[#07010f] flex items-center justify-center p-4">
+      {/* Background */}
+      <div className="absolute inset-0 bg-[radial-gradient(circle_at_top_left,_rgba(255,0,140,0.25),_transparent_30%),radial-gradient(circle_at_top_right,_rgba(0,255,255,0.18),_transparent_25%),radial-gradient(circle_at_bottom_left,_rgba(180,0,255,0.20),_transparent_30%)]" />
+
+      {/* Grid */}
+      <div className="absolute inset-0 opacity-20 bg-[linear-gradient(rgba(255,255,255,0.05)_1px,transparent_1px),linear-gradient(90deg,rgba(255,255,255,0.05)_1px,transparent_1px)] bg-[size:40px_40px]" />
+
+      {/* Glow blobs */}
+      <div className="absolute top-[-120px] left-[-80px] w-[320px] h-[320px] bg-fuchsia-600/30 blur-[120px] rounded-full" />
+      <div className="absolute bottom-[-100px] right-[-80px] w-[300px] h-[300px] bg-cyan-500/20 blur-[120px] rounded-full" />
+
       <div className="relative w-full max-w-md">
-        {/* Glassmorphic login card */}
-        <div className="relative bg-slate-900/40 backdrop-blur-2xl rounded-2xl border border-purple-500/20 shadow-2xl shadow-purple-500/10 overflow-hidden">
-          {/* Neon glow effect */}
-          <div className="absolute inset-0 bg-gradient-to-br from-purple-500/10 via-transparent to-cyan-500/10"></div>
-          <div className="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-purple-500 via-cyan-500 to-blue-500"></div>
-          
-          <div className="relative p-8">
-            {/* Logo and branding */}
+        {/* Outer glow */}
+        <div className="absolute -inset-[1px] rounded-[28px] bg-gradient-to-r from-fuchsia-500 via-pink-500 to-cyan-400 opacity-70 blur-md" />
+
+        {/* Card */}
+        <div className="relative rounded-[28px] border border-white/10 bg-white/5 backdrop-blur-2xl shadow-[0_0_60px_rgba(255,0,153,0.18)] overflow-hidden">
+          {/* scanline */}
+          <div className="pointer-events-none absolute inset-0 opacity-[0.08] bg-[repeating-linear-gradient(to_bottom,rgba(255,255,255,0.2)_0px,rgba(255,255,255,0.2)_1px,transparent_2px,transparent_4px)]" />
+
+          {/* top neon line */}
+          <div className="h-1 w-full bg-gradient-to-r from-fuchsia-500 via-pink-400 to-cyan-400" />
+
+          <div className="relative px-8 py-10">
+            {/* Logo */}
             <div className="text-center mb-8">
-              <div className="inline-flex items-center justify-center w-16 h-16 rounded-2xl bg-gradient-to-br from-purple-600 to-cyan-600 mb-4">
-                <Gamepad2 className="w-8 h-8 text-white" />
+              <div className="mx-auto mb-4 flex h-20 w-20 items-center justify-center rounded-3xl border border-white/10 bg-gradient-to-br from-fuchsia-500/80 via-pink-500/70 to-cyan-500/80 shadow-[0_0_30px_rgba(255,0,180,0.35)]">
+                <Gamepad2 className="h-10 w-10 text-white" />
               </div>
-              <h1 className="text-3xl font-bold bg-gradient-to-r from-purple-400 via-cyan-400 to-blue-400 bg-clip-text text-transparent mb-2">
-                Ridzhan SASS
+
+              <h1 className="text-4xl font-extrabold tracking-wide uppercase bg-gradient-to-r from-fuchsia-400 via-pink-300 to-cyan-300 bg-clip-text text-transparent drop-shadow-[0_0_20px_rgba(255,0,180,0.35)]">
+                Cyber Login
               </h1>
-              <p className="text-slate-400">Admin Panel Login</p>
+
+              <p className="mt-2 text-sm text-fuchsia-100/70 tracking-[0.25em] uppercase">
+                Gameclub Admin Access
+              </p>
             </div>
 
-            {/* Login form */}
-            <form onSubmit={handleLogin} className="space-y-6">
+            <form onSubmit={handleLogin} className="space-y-5">
               <div className="space-y-2">
-                <Label htmlFor="username" className="text-slate-300">
+                <Label
+                  htmlFor="username"
+                  className="text-xs uppercase tracking-[0.2em] text-fuchsia-100/80"
+                >
                   Username
                 </Label>
-                <div className="relative">
-                  <User className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-500" />
+
+                <div className="relative group">
+                  <User className="absolute left-4 top-1/2 -translate-y-1/2 h-4 w-4 text-fuchsia-300/70 group-focus-within:text-fuchsia-300" />
                   <Input
                     id="username"
                     type="text"
                     placeholder="Enter username"
                     value={username}
                     onChange={(e) => setUsername(e.target.value)}
-                    className="pl-10 bg-slate-900/50 border-slate-700/50 text-slate-100 placeholder:text-slate-500 focus:border-purple-500/50 focus:ring-purple-500/20"
-                    required 
-                  />
-                </div>
-              </div>
-
-              <div className="space-y-2">
-                <Label htmlFor="password" className="text-slate-300">
-                  Password
-                </Label>
-                <div className="relative">
-                  <Lock className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-500" />
-                  <Input
-                    id="password"
-                    type="password"
-                    placeholder="Enter password"
-                    value={password}
-                    onChange={(e) => setPassword(e.target.value)}
-                    className="pl-10 bg-slate-900/50 border-slate-700/50 text-slate-100 placeholder:text-slate-500 focus:border-purple-500/50 focus:ring-purple-500/20"
+                    className="h-12 pl-11 rounded-xl border border-fuchsia-500/20 bg-[#12081f]/80 text-white placeholder:text-white/35 focus-visible:ring-0 focus:border-fuchsia-400 focus:shadow-[0_0_0_1px_rgba(255,0,180,0.4),0_0_20px_rgba(255,0,180,0.12)]"
                     required
                   />
                 </div>
               </div>
 
+              <div className="space-y-2">
+                <Label
+                  htmlFor="password"
+                  className="text-xs uppercase tracking-[0.2em] text-fuchsia-100/80"
+                >
+                  Password
+                </Label>
+
+                <div className="relative group">
+                  <Lock className="absolute left-4 top-1/2 -translate-y-1/2 h-4 w-4 text-cyan-300/70 group-focus-within:text-cyan-300" />
+                  <Input
+                    id="password"
+                    type={showPassword ? "text" : "password"}
+                    placeholder="Enter password"
+                    value={password}
+                    onChange={(e) => setPassword(e.target.value)}
+                    className="h-12 pl-11 pr-12 rounded-xl border border-cyan-500/20 bg-[#12081f]/80 text-white placeholder:text-white/35 focus-visible:ring-0 focus:border-cyan-400 focus:shadow-[0_0_0_1px_rgba(0,255,255,0.35),0_0_20px_rgba(0,255,255,0.10)]"
+                    required
+                  />
+                  <button
+                    type="button"
+                    onClick={() => setShowPassword((prev) => !prev)}
+                    className="absolute right-4 top-1/2 -translate-y-1/2 text-white/50 hover:text-cyan-300 transition-colors"
+                  >
+                    {showPassword ? (
+                      <EyeOff className="h-4 w-4" />
+                    ) : (
+                      <Eye className="h-4 w-4" />
+                    )}
+                  </button>
+                </div>
+              </div>
+
+              {error && (
+                <div className="rounded-xl border border-red-500/30 bg-red-500/10 px-4 py-3 text-sm text-red-300 shadow-[0_0_18px_rgba(255,0,0,0.12)]">
+                  {error}
+                </div>
+              )}
+
               <Button
                 type="submit"
-                className="w-full bg-gradient-to-r from-purple-600 to-cyan-600 hover:from-purple-700 hover:to-cyan-700 text-white font-semibold py-6 rounded-lg shadow-lg shadow-purple-500/25 transition-all duration-300 hover:shadow-purple-500/40"
+                className="h-12 w-full rounded-xl border border-white/10 bg-gradient-to-r from-fuchsia-600 via-pink-500 to-cyan-500 text-white font-bold uppercase tracking-[0.18em] shadow-[0_0_25px_rgba(255,0,170,0.28)] transition-all duration-300 hover:scale-[1.02] hover:shadow-[0_0_40px_rgba(255,0,170,0.45)]"
               >
                 Sign In
               </Button>
             </form>
 
-            {/* Footer info */}
-            <div className="mt-6 text-center text-sm text-slate-500">
-              <p>Receptionist Portal</p>
+            <div className="mt-6 text-center">
+              <p className="text-xs tracking-[0.25em] uppercase text-white/35">
+                Receptionist Portal
+              </p>
             </div>
           </div>
         </div>
