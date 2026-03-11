@@ -16,7 +16,7 @@ export function DashboardLayout() {
       {/* Main content never moves */}
       <div className="relative flex min-h-screen flex-col pl-[95px]">
         <Header />
-        <main className="flex-1 p-4 md:p-6">
+        <main className="flex-1 pt-[144px] p-4 md:p-6">
           <Outlet />
         </main> 
       </div>
