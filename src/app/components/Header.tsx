@@ -135,9 +135,9 @@ export function Header() {
               <div className="group relative">
                 <div className="absolute -inset-[1px] rounded-[20px] bg-gradient-to-r from-violet-500/0 via-violet-400/20 to-cyan-400/20 opacity-0 blur-sm transition duration-300 group-focus-within:opacity-100 dark:from-fuchsia-500/0 dark:via-fuchsia-400/20 dark:to-cyan-400/20" />
 
-                <div className="relative overflow-hidden rounded-[20px] border border-slate-300/70 bg-white/60 shadow-[inset_0_1px_0_rgba(255,255,255,0.9),0_8px_24px_rgba(15,23,42,0.08)] backdrop-blur-2xl transition-all duration-300 group-focus-within:border-violet-400/40 group-focus-within:bg-white/80 dark:border-white/10 dark:bg-white/[0.05] dark:shadow-[inset_0_1px_0_rgba(255,255,255,0.07),0_8px_24px_rgba(0,0,0,0.18)] dark:group-focus-within:border-fuchsia-400/30 dark:group-focus-within:bg-white/[0.08]">
+                <div className="relative  ml-[100px] overflow-hidden rounded-[20px] border border-slate-300/70 bg-white/60 shadow-[inset_0_1px_0_rgba(255,255,255,0.9),0_8px_24px_rgba(15,23,42,0.08)] backdrop-blur-2xl transition-all duration-300 group-focus-within:border-violet-400/40 group-focus-within:bg-white/80 dark:border-white/10 dark:bg-white/[0.05] dark:shadow-[inset_0_1px_0_rgba(255,255,255,0.07),0_8px_24px_rgba(0,0,0,0.18)] dark:group-focus-within:border-fuchsia-400/30 dark:group-focus-within:bg-white/[0.08]">
                   <div className="absolute inset-0 bg-gradient-to-r from-white/70 via-transparent to-white/30 dark:from-white/[0.05] dark:via-transparent dark:to-white/[0.03]" />
-                  <div className="absolute inset-y-0  ml-[100px] w-14 bg-gradient-to-r from-violet-500/8 to-transparent dark:from-fuchsia-500/8" />
+                  <div className="absolute inset-y-0  w-14 bg-gradient-to-r from-violet-500/8 to-transparent dark:from-fuchsia-500/8" />
 
                   <Search className="pointer-events-none absolute left-4 top-1/2 z-10 h-4 w-4 -translate-y-1/2 text-slate-500 transition-colors duration-300 group-focus-within:text-cyan-600 dark:text-slate-400 dark:group-focus-within:text-cyan-300" />
 
