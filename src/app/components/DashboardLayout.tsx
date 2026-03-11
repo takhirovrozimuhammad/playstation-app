@@ -1,10 +1,10 @@
 import { useEffect, useState } from "react";
 import { Outlet } from "react-router";
-import Sidebar, { SIDEBAR_MODE_KEY } from "./sidebar";
+import Sidebar, { SIDEBAR_MODE_KEY } from "./Sidebar";
 import { Header } from "./Header";
 
 type SidebarMode = "expanded" | "collapsed" | "auto";
-
+ 
 const COLLAPSED_OFFSET = 95;
 const EXPANDED_OFFSET = 248;
 
