@@ -24,7 +24,6 @@ export function Header() {
   return (
     <header className="sticky top-0 z-30 border-b border-white/10 bg-[#07101f]/70 backdrop-blur-xl">
       <div className="flex items-center justify-between gap-4 px-4 py-4 md:px-6">
-        {/* Search */}
         <div className="flex-1 max-w-xl">
           <div className="relative">
             <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-500" />
@@ -36,9 +35,7 @@ export function Header() {
           </div>
         </div>
 
-        {/* Right side actions */}
         <div className="ml-2 flex items-center gap-2 md:ml-4 md:gap-4">
-          {/* Notifications */}
           <Button
             variant="ghost"
             size="icon"
@@ -53,7 +50,6 @@ export function Header() {
             )}
           </Button>
 
-          {/* User menu */}
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
               <Button
