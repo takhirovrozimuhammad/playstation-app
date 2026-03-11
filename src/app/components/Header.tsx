@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import {
   Bell,
   Search,
@@ -22,6 +22,12 @@ import {
 } from "./ui/dropdown-menu";
 import { useNavigate } from "react-router";
 import { Badge } from "./ui/badge";
+import {
+  SIDEBAR_MODE_KEY,
+  COLLAPSED_WIDTH,
+  EXPANDED_WIDTH,
+  type SidebarMode,
+} from "./Sidebar";
 
 const THEME_KEY = "ridzhan_theme";
 
@@ -31,6 +37,7 @@ export function Header() {
   const navigate = useNavigate();
   const [unreadNotifications] = useState(3);
   const [theme, setTheme] = useState<ThemeMode>("dark");
+  const [sidebarMode, setSidebarMode] = useState<SidebarMode>("auto");
 
   useEffect(() => {
     const savedTheme = localStorage.getItem(THEME_KEY) as ThemeMode | null;
@@ -45,6 +52,32 @@ export function Header() {
     const initialTheme: ThemeMode = prefersDark ? "dark" : "light";
     setTheme(initialTheme);
     applyTheme(initialTheme);
+  }, []);
+
+  useEffect(() => {
+    const syncSidebarMode = () => {
+      const savedMode = localStorage.getItem(SIDEBAR_MODE_KEY) as SidebarMode | null;
+
+      if (
+        savedMode === "expanded" ||
+        savedMode === "collapsed" ||
+        savedMode === "auto"
+      ) {
+        setSidebarMode(savedMode);
+      } else {
+        setSidebarMode("auto");
+      }
+    };
+
+    syncSidebarMode();
+
+    window.addEventListener("ridzhan-sidebar-mode-change", syncSidebarMode);
+    window.addEventListener("storage", syncSidebarMode);
+
+    return () => {
+      window.removeEventListener("ridzhan-sidebar-mode-change", syncSidebarMode);
+      window.removeEventListener("storage", syncSidebarMode);
+    };
   }, []);
 
   const applyTheme = (mode: ThemeMode) => {
@@ -69,9 +102,21 @@ export function Header() {
     navigate("/login");
   };
 
+  const leftOffset = useMemo(() => {
+    return sidebarMode === "expanded" ? EXPANDED_WIDTH : COLLAPSED_WIDTH + 1;
+  }, [sidebarMode]);
+
+  const searchOffset = sidebarMode === "expanded" ? EXPANDED_WIDTH - (COLLAPSED_WIDTH + 1) : 0;
+
   return (
-    <header className="fixed inset-x-0 top-0 z-30 h-[78px]">
-      <div className="relative h-full border-b border-slate-200/70 bg-white/70 backdrop-blur-3xl transition-colors duration-300 dark:border-cyan-400/15 dark:bg-[#07101f]/58">
+    <header
+      className="fixed top-0 z-30 h-[78px] overflow-visible transition-[left,width] duration-500 ease-[cubic-bezier(0.22,1,0.36,1)]"
+      style={{
+        left: `${leftOffset}px`,
+        width: `calc(100% - ${leftOffset}px)`,
+      }}
+    >
+      <div className="relative h-full overflow-visible border-b border-slate-200/70 bg-white/70 backdrop-blur-3xl transition-colors duration-300 dark:border-cyan-400/15 dark:bg-[#07101f]/58">
         {/* base layer */}
         <div className="absolute inset-0 bg-[linear-gradient(180deg,rgba(255,255,255,0.92),rgba(248,250,252,0.82))] dark:bg-[linear-gradient(180deg,rgba(7,16,31,0.96),rgba(7,16,31,0.78))]" />
 
@@ -85,9 +130,12 @@ export function Header() {
         <div className="absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-slate-400/30 to-transparent dark:via-white/20" />
         <div className="absolute inset-x-0 bottom-0 h-px bg-gradient-to-r from-violet-400/30 via-cyan-400/20 to-blue-400/30 dark:from-fuchsia-400/30 dark:via-cyan-300/30 dark:to-blue-400/30" />
 
-        <div className="relative flex h-full items-center justify-between gap-4 pl-[116px] pr-4 md:pr-6">
+        <div className="relative flex h-full items-center justify-between gap-4 px-4 md:px-6">
           {/* Search */}
-          <div className="flex-1">
+          <div
+            className="flex-1 transition-[padding-left] duration-500 ease-[cubic-bezier(0.22,1,0.36,1)]"
+            style={{ paddingLeft: `${searchOffset}px` }}
+          >
             <div className="max-w-[520px]">
               <div className="group relative">
                 <div className="absolute -inset-[1px] rounded-[20px] bg-gradient-to-r from-violet-500/0 via-violet-400/20 to-cyan-400/20 opacity-0 blur-sm transition duration-300 group-focus-within:opacity-100 dark:from-fuchsia-500/0 dark:via-fuchsia-400/20 dark:to-cyan-400/20" />
@@ -109,7 +157,7 @@ export function Header() {
           </div>
 
           {/* Right */}
-          <div className="ml-3 flex items-center gap-2 md:gap-3">
+          <div className="ml-3 flex shrink-0 items-center gap-2 md:gap-3">
             {/* Theme toggle */}
             <Button
               type="button"
@@ -121,9 +169,9 @@ export function Header() {
             >
               <div className="absolute inset-0 bg-gradient-to-br from-white/70 via-transparent to-white/20 dark:from-white/[0.05] dark:via-transparent dark:to-white/[0.03]" />
               {theme === "dark" ? (
-                <Sun className="relative z-10 h-4.5 w-4.5 text-amber-500 transition-transform duration-300 group-hover:rotate-12" />
+                <Sun className="relative z-10 h-[18px] w-[18px] text-amber-500 transition-transform duration-300 group-hover:rotate-12" />
               ) : (
-                <Moon className="relative z-10 h-4.5 w-4.5 text-violet-600 transition-transform duration-300 group-hover:-rotate-12 dark:text-cyan-300" />
+                <Moon className="relative z-10 h-[18px] w-[18px] text-violet-600 transition-transform duration-300 group-hover:-rotate-12 dark:text-cyan-300" />
               )}
             </Button>
 
@@ -135,7 +183,7 @@ export function Header() {
               onClick={() => navigate("/notifications")}
             >
               <div className="absolute inset-0 bg-gradient-to-br from-white/70 via-transparent to-white/20 dark:from-white/[0.05] dark:via-transparent dark:to-white/[0.03]" />
-              <Bell className="relative z-10 h-4.5 w-4.5 transition-transform duration-300 group-hover:scale-105" />
+              <Bell className="relative z-10 h-[18px] w-[18px] transition-transform duration-300 group-hover:scale-105" />
 
               {unreadNotifications > 0 && (
                 <Badge className="absolute -right-1 -top-1 z-20 flex h-5 min-w-5 items-center justify-center rounded-full border border-white/70 bg-gradient-to-r from-fuchsia-500 via-violet-400 to-cyan-400 px-1 text-[10px] font-semibold text-white shadow-[0_0_16px_rgba(168,85,247,0.35)] dark:border-[#07101f]">
@@ -166,7 +214,7 @@ export function Header() {
 
                     <div className="relative flex h-10 w-10 items-center justify-center rounded-2xl border border-white/40 bg-gradient-to-br from-fuchsia-500 via-violet-400 to-cyan-400 shadow-[0_0_24px_rgba(168,85,247,0.24)]">
                       <div className="absolute inset-0 rounded-2xl bg-gradient-to-br from-white/18 to-transparent" />
-                      <User className="relative z-10 h-4.5 w-4.5 text-white" />
+                      <User className="relative z-10 h-[18px] w-[18px] text-white" />
                     </div>
 
                     <ChevronDown className="hidden h-4 w-4 text-slate-500 transition duration-300 group-hover:text-slate-800 dark:text-slate-400 dark:group-hover:text-white sm:block" />
@@ -176,7 +224,8 @@ export function Header() {
 
               <DropdownMenuContent
                 align="end"
-                className="w-64 overflow-hidden rounded-[24px] border border-slate-300/70 bg-white/90 p-1.5 text-slate-800 shadow-[0_24px_60px_rgba(15,23,42,0.12)] backdrop-blur-3xl dark:border-white/10 dark:bg-[#0b1220]/95 dark:text-slate-200 dark:shadow-[0_24px_60px_rgba(0,0,0,0.45)]"
+                sideOffset={10}
+                className="z-[120] w-64 overflow-hidden rounded-[24px] border border-slate-300/70 bg-white/95 p-1.5 text-slate-800 shadow-[0_24px_60px_rgba(15,23,42,0.18)] backdrop-blur-3xl dark:border-white/10 dark:bg-[#0b1220]/95 dark:text-slate-200 dark:shadow-[0_24px_60px_rgba(0,0,0,0.52)]"
               >
                 <div className="absolute inset-0 bg-[radial-gradient(circle_at_top_left,rgba(168,85,247,0.10),transparent_24%),radial-gradient(circle_at_bottom_right,rgba(59,130,246,0.10),transparent_24%)] dark:bg-[radial-gradient(circle_at_top_left,rgba(217,70,239,0.14),transparent_24%),radial-gradient(circle_at_bottom_right,rgba(34,211,238,0.12),transparent_24%)]" />
                 <div className="absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-slate-400/30 to-transparent dark:via-white/25" />
