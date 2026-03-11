@@ -1195,7 +1195,7 @@ export function Dashboard() {
               </div>
             </div>
           </div>
-        </DialogContent> 
+        </DialogContent>  
       </Dialog>
     </div>
   );
