@@ -425,14 +425,7 @@ export function Dashboard() {
   const [bookingVip, setBookingVip] = useState(false);
   const [bookingDuration, setBookingDuration] = useState<DurationPreset>("60");
 
-  useEffect(() => {
-    document.documentElement.classList.add("dark");
-    document.body.classList.add("dark");
-    return () => {
-      document.documentElement.classList.remove("dark");
-      document.body.classList.remove("dark");
-    };
-  }, []);
+[]);
 
   const todayStartedCount = useMemo(() => {
     return rooms.filter((room) => room.sessionStart && isToday(room.sessionStart)).length;
