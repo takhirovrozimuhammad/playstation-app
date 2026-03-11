@@ -614,7 +614,7 @@ export function Dashboard() {
         <div className="pointer-events-none absolute -left-24 top-[-80px] h-72 w-72 rounded-full bg-fuchsia-500/15 blur-3xl dark:bg-fuchsia-600/25" />
         <div className="pointer-events-none absolute right-[-60px] top-1/4 h-80 w-80 rounded-full bg-cyan-400/15 blur-3xl dark:bg-cyan-500/20" />
         <div className="pointer-events-none absolute bottom-[-80px] left-1/3 h-72 w-72 rounded-full bg-violet-400/15 blur-3xl dark:bg-violet-500/20" />
-        <div className="pointer-events-none absolute inset-0 bg-[linear-gradient(rgba(15,23,42,0.03)_1px,transparent_1px),linear-gradient(90deg,rgba(15,23,42,0.03)_1px,transparent_1px)] dark:bg-[linear-gradient(rgba(255,255,255,0.03)_1px,transparent_1px),linear-gradient(90deg,rgba(255,255,255,0.03)_1px,transparent_1px)] bg-[size:42px_42px] opacity-30 dark:opacity-20" />
+        <div className="pointer-events-none absolute inset-0 bg-[linear-gradient(rgba(15,23,42,0.03)_1px,transparent_1px),linear-gradient(90deg,rgba(15,23,42,0.03)_1px,transparent_1px)] bg-[size:42px_42px] opacity-30 dark:bg-[linear-gradient(rgba(255,255,255,0.03)_1px,transparent_1px),linear-gradient(90deg,rgba(255,255,255,0.03)_1px,transparent_1px)] dark:opacity-20" />
 
         <div className="relative space-y-6">
           {/* Header */}
@@ -893,7 +893,7 @@ export function Dashboard() {
                   onChange={(e) => setSessionVip(e.target.checked)}
                   className="h-4 w-4 accent-fuchsia-500"
                 />
-                <Label htmlFor="session-vip" className="cursor-pointer text-sm">
+                <Label htmlFor="session-vip" className="cursor-pointer text-sm text-slate-700 dark:text-slate-200">
                   VIP qilish — vaqt cheklanmaydi
                 </Label>
               </div>
@@ -1071,7 +1071,7 @@ export function Dashboard() {
                     value={bookingClientName}
                     onChange={(e) => setBookingClientName(e.target.value)}
                     placeholder="Mijoz ismi"
-                    className="h-12 rounded-2xl border border-slate-200 bg-white/80 pl-11 text-slate-900 placeholder:text-slate-400 focus:border-fuchsia-400/60 focus:ring-2 focus:ring-fuchsia-400/20 dark:border-white/10 dark:bg-white/8 dark:text-slate-100 dark:placeholder:text-slate-400"
+                    className="h-12 rounded-2xl border border-slate-200 bg-white/80 pl-11 text-slate-900 placeholder:text-slate-400 focus:border-fuchsia-400/60 focus:ring-2 focus:ring-fuchsia-400/20 dark:border-white/10 dark:bg-white/[0.08] dark:text-slate-100 dark:placeholder:text-slate-400"
                   />
                 </div>
               </div>
@@ -1086,7 +1086,7 @@ export function Dashboard() {
                     value={bookingPhone}
                     onChange={(e) => setBookingPhone(e.target.value)}
                     placeholder="+966 5X XXX XX XX"
-                    className="h-12 rounded-2xl border border-slate-200 bg-white/80 pl-11 text-slate-900 placeholder:text-slate-400 focus:border-fuchsia-400/60 focus:ring-2 focus:ring-fuchsia-400/20 dark:border-white/10 dark:bg-white/8 dark:text-slate-100 dark:placeholder:text-slate-400"
+                    className="h-12 rounded-2xl border border-slate-200 bg-white/80 pl-11 text-slate-900 placeholder:text-slate-400 focus:border-fuchsia-400/60 focus:ring-2 focus:ring-fuchsia-400/20 dark:border-white/10 dark:bg-white/[0.08] dark:text-slate-100 dark:placeholder:text-slate-400"
                   />
                 </div>
               </div>
@@ -1098,7 +1098,7 @@ export function Dashboard() {
                 <select
                   value={bookingRoomId}
                   onChange={(e) => setBookingRoomId(e.target.value)}
-                  className="h-12 w-full rounded-2xl border border-slate-200 bg-white/80 px-4 text-slate-900 outline-none focus:border-cyan-400/60 focus:ring-2 focus:ring-cyan-400/20 dark:border-white/10 dark:bg-white/8 dark:text-slate-100"
+                  className="h-12 w-full rounded-2xl border border-slate-200 bg-white/80 px-4 text-slate-900 outline-none focus:border-cyan-400/60 focus:ring-2 focus:ring-cyan-400/20 dark:border-white/10 dark:bg-white/[0.08] dark:text-slate-100"
                 >
                   {freeOrBookedRooms.map((room) => (
                     <option
@@ -1120,7 +1120,7 @@ export function Dashboard() {
                   type="time"
                   value={bookingStart}
                   onChange={(e) => setBookingStart(e.target.value)}
-                  className="h-12 rounded-2xl border border-slate-200 bg-white/80 text-slate-900 focus:border-cyan-400/60 focus:ring-2 focus:ring-cyan-400/20 dark:border-white/10 dark:bg-white/8 dark:text-slate-100"
+                  className="h-12 rounded-2xl border border-slate-200 bg-white/80 text-slate-900 focus:border-cyan-400/60 focus:ring-2 focus:ring-cyan-400/20 dark:border-white/10 dark:bg-white/[0.08] dark:text-slate-100"
                 />
               </div>
 
@@ -1132,7 +1132,7 @@ export function Dashboard() {
                   onChange={(e) => setBookingVip(e.target.checked)}
                   className="h-4 w-4 accent-fuchsia-500"
                 />
-                <Label htmlFor="booking-vip" className="cursor-pointer text-sm">
+                <Label htmlFor="booking-vip" className="cursor-pointer text-sm text-slate-700 dark:text-slate-200">
                   VIP bron — tugash vaqti yo‘q
                 </Label>
               </div>
@@ -1195,7 +1195,7 @@ export function Dashboard() {
               </div>
             </div>
           </div>
-        </DialogContent>  
+        </DialogContent>
       </Dialog>
     </div>
   );
