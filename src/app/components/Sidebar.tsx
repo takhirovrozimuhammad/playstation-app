@@ -42,15 +42,15 @@ export default function Sidebar() {
       "
       aria-label="Sidebar navigation"
     >
-      <div className="relative h-full overflow-hidden border-r border-white/10 bg-slate-950/60 backdrop-blur-2xl">
+      <div className="relative h-full overflow-hidden border-r border-fuchsia-400/10 bg-[#07101f]/80 backdrop-blur-2xl">
         {/* layered background */}
-        <div className="absolute inset-0 bg-[radial-gradient(circle_at_top_left,rgba(168,85,247,0.22),transparent_30%),radial-gradient(circle_at_bottom_left,rgba(34,211,238,0.16),transparent_28%),radial-gradient(circle_at_bottom_center,rgba(56,189,248,0.08),transparent_25%),linear-gradient(180deg,rgba(255,255,255,0.05),rgba(255,255,255,0.02))]" />
+        <div className="absolute inset-0 bg-[radial-gradient(circle_at_top_left,rgba(217,70,239,0.22),transparent_30%),radial-gradient(circle_at_bottom_left,rgba(34,211,238,0.16),transparent_28%),radial-gradient(circle_at_bottom_center,rgba(56,189,248,0.08),transparent_25%),linear-gradient(180deg,rgba(255,255,255,0.05),rgba(255,255,255,0.02))]" />
 
         {/* subtle grid */}
-        <div className="absolute inset-0 opacity-[0.06] [background-image:linear-gradient(rgba(255,255,255,0.08)_1px,transparent_1px),linear-gradient(90deg,rgba(255,255,255,0.08)_1px,transparent_1px)] [background-size:26px_26px]" />
+        <div className="absolute inset-0 opacity-[0.05] [background-image:linear-gradient(rgba(255,255,255,0.08)_1px,transparent_1px),linear-gradient(90deg,rgba(255,255,255,0.08)_1px,transparent_1px)] [background-size:26px_26px]" />
 
         {/* neon right line */}
-        <div className="absolute right-0 top-0 h-full w-px bg-gradient-to-b from-fuchsia-400/80 via-cyan-400/70 to-blue-500/80 shadow-[0_0_16px_rgba(34,211,238,0.55)]" />
+        <div className="absolute right-0 top-0 h-full w-px bg-gradient-to-b from-fuchsia-400/90 via-cyan-400/80 to-blue-500/90 shadow-[0_0_18px_rgba(34,211,238,0.60)]" />
 
         {/* glow blobs */}
         <div className="absolute -left-16 top-4 h-36 w-36 rounded-full bg-fuchsia-500/16 blur-3xl" />
@@ -64,15 +64,15 @@ export default function Sidebar() {
                 flex items-center gap-3 rounded-[26px]
                 border border-white/10 bg-white/[0.06]
                 p-3 backdrop-blur-xl
-                shadow-[inset_0_1px_0_rgba(255,255,255,0.08),0_12px_30px_rgba(0,0,0,0.20)]
+                shadow-[inset_0_1px_0_rgba(255,255,255,0.08),0_12px_30px_rgba(0,0,0,0.24)]
               "
             >
               <div
                 className="
                   relative flex h-12 w-12 shrink-0 items-center justify-center
                   rounded-2xl border border-white/10
-                  bg-gradient-to-br from-fuchsia-500/30 to-cyan-400/25
-                  shadow-[0_0_24px_rgba(168,85,247,0.24)]
+                  bg-gradient-to-br from-fuchsia-500/30 via-violet-500/20 to-cyan-400/25
+                  shadow-[0_0_26px_rgba(168,85,247,0.26)]
                 "
               >
                 <div className="absolute inset-0 rounded-2xl bg-gradient-to-br from-white/10 to-transparent" />
@@ -80,22 +80,10 @@ export default function Sidebar() {
               </div>
 
               <div className="min-w-0 overflow-hidden">
-                <h2
-                  className="
-                    truncate text-[17px] font-semibold tracking-[0.01em] text-white
-                    opacity-0 transition-all duration-300
-                    group-hover:opacity-100
-                  "
-                >
+                <h2 className="truncate text-[17px] font-semibold tracking-[0.01em] text-white opacity-0 transition-all duration-300 group-hover:opacity-100">
                   Ridzhan SASS
                 </h2>
-                <p
-                  className="
-                    truncate text-xs text-white/60
-                    opacity-0 transition-all duration-300 delay-75
-                    group-hover:opacity-100
-                  "
-                >
+                <p className="truncate text-xs text-white/60 opacity-0 transition-all duration-300 delay-75 group-hover:opacity-100">
                   Admin Access
                 </p>
               </div>
@@ -117,7 +105,7 @@ export default function Sidebar() {
                       "transition-all duration-300 ease-out",
                       isActive
                         ? "border-fuchsia-400/30 bg-gradient-to-r from-fuchsia-500/18 via-violet-500/12 to-cyan-400/16 text-cyan-300 shadow-[0_0_24px_rgba(168,85,247,0.24)]"
-                        : "border-transparent bg-white/[0.02] text-white/70 hover:border-white/10 hover:bg-white/[0.05] hover:text-white hover:shadow-[0_10px_24px_rgba(0,0,0,0.16)]",
+                        : "border-transparent bg-white/[0.02] text-white/70 hover:border-white/10 hover:bg-white/[0.05] hover:text-white hover:shadow-[0_10px_24px_rgba(0,0,0,0.18)]",
                     ].join(" ")
                   }
                 >
@@ -141,13 +129,7 @@ export default function Sidebar() {
                         />
                       </div>
 
-                      <span
-                        className="
-                          relative z-10 whitespace-nowrap text-sm font-medium
-                          opacity-0 transition-all duration-300
-                          group-hover:opacity-100
-                        "
-                      >
+                      <span className="relative z-10 whitespace-nowrap text-sm font-medium opacity-0 transition-all duration-300 group-hover:opacity-100">
                         {item.label}
                       </span>
 
@@ -172,7 +154,7 @@ export default function Sidebar() {
                 flex items-center gap-3 rounded-[26px]
                 border border-white/10 bg-white/[0.05]
                 p-3 backdrop-blur-xl
-                shadow-[inset_0_1px_0_rgba(255,255,255,0.06),0_10px_30px_rgba(0,0,0,0.16)]
+                shadow-[inset_0_1px_0_rgba(255,255,255,0.06),0_10px_30px_rgba(0,0,0,0.18)]
               "
             >
               <div
@@ -188,22 +170,10 @@ export default function Sidebar() {
               </div>
 
               <div className="min-w-0 overflow-hidden">
-                <p
-                  className="
-                    truncate text-sm font-medium text-white
-                    opacity-0 transition-all duration-300
-                    group-hover:opacity-100
-                  "
-                >
+                <p className="truncate text-sm font-medium text-white opacity-0 transition-all duration-300 group-hover:opacity-100">
                   Ridzhan Admin
                 </p>
-                <p
-                  className="
-                    truncate text-xs text-white/60
-                    opacity-0 transition-all duration-300 delay-75
-                    group-hover:opacity-100
-                  "
-                >
+                <p className="truncate text-xs text-white/60 opacity-0 transition-all duration-300 delay-75 group-hover:opacity-100">
                   Gaming Club System
                 </p>
               </div>
