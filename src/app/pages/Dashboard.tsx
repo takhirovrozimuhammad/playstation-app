@@ -2,16 +2,16 @@ import { useMemo, useState } from "react";
 import { format } from "date-fns";
 import {
   CalendarCheck,
+  CheckCircle2,
   Clock3,
   DollarSign,
   Gamepad2,
   Monitor,
+  Phone,
   Plus,
   Sparkles,
   TrendingUp,
-  Phone,
-  X,
-  CheckCircle2,
+  User2,
 } from "lucide-react";
 
 import { Button } from "../components/ui/button";
@@ -39,7 +39,9 @@ import {
 
 type RoomStatus = "free" | "booked" | "occupied" | "cleaning";
 type RoomKind = "playstation" | "pc";
-type BookingStatus = "active" | "confirmed" | "completed";
+type BookingStatus = "confirmed" | "completed";
+
+type DurationPreset = "30" | "45" | "60" | "120" | "180";
 
 type Room = {
   id: string;
@@ -48,14 +50,18 @@ type Room = {
   deviceLabel: string;
   pricePerHour: number;
   status: RoomStatus;
+
+  sessionStart?: Date | null;
   occupiedUntil?: Date | null;
   bookedFor?: Date | null;
+  isVip?: boolean;
 };
 
 type Booking = {
   id: string;
   roomId: string;
   phone: string;
+  clientName: string;
   startTime: Date;
   endTime?: Date | null;
   isVip: boolean;
@@ -67,6 +73,8 @@ type Booking = {
 /* =========================
    MOCK DATA
 ========================= */
+
+const now = new Date();
 
 const initialRooms: Room[] = [
   {
@@ -101,7 +109,9 @@ const initialRooms: Room[] = [
     deviceLabel: "PS5",
     pricePerHour: 60,
     status: "occupied",
+    sessionStart: new Date(new Date().setHours(20, 22, 0, 0)),
     occupiedUntil: new Date(new Date().setHours(21, 52, 0, 0)),
+    isVip: false,
   },
   {
     id: "room-5",
@@ -127,7 +137,9 @@ const initialRooms: Room[] = [
     deviceLabel: "PS4",
     pricePerHour: 45,
     status: "occupied",
-    occupiedUntil: new Date(new Date().setHours(22, 22, 0, 0)),
+    sessionStart: new Date(new Date().setHours(19, 20, 0, 0)),
+    occupiedUntil: null,
+    isVip: true,
   },
   {
     id: "room-8",
@@ -152,65 +164,36 @@ const initialRooms: Room[] = [
     deviceLabel: "PC",
     pricePerHour: 35,
     status: "occupied",
+    sessionStart: new Date(new Date().setHours(20, 0, 0, 0)),
     occupiedUntil: new Date(new Date().setHours(20, 55, 0, 0)),
+    isVip: false,
   },
 ];
 
 const initialBookings: Booking[] = [
   {
-    id: "king-1",
-    roomId: "room-4",
-    phone: "+966 50 111 22 33",
-    startTime: new Date(new Date().setHours(20, 22, 0, 0)),
-    endTime: new Date(new Date().setHours(21, 52, 0, 0)),
-    isVip: false,
-    totalAmount: 150,
-    status: "active",
-    createdAt: new Date(),
-  },
-  {
     id: "king-2",
     roomId: "room-3",
     phone: "+966 50 444 77 88",
+    clientName: "Ahmed Al-Rashid",
     startTime: new Date(new Date().setHours(21, 52, 0, 0)),
     endTime: new Date(new Date().setHours(22, 52, 0, 0)),
     isVip: false,
     totalAmount: 100,
     status: "confirmed",
-    createdAt: new Date(),
-  },
-  {
-    id: "king-3",
-    roomId: "room-7",
-    phone: "+966 55 888 10 10",
-    startTime: new Date(new Date().setHours(19, 22, 0, 0)),
-    endTime: new Date(new Date().setHours(22, 22, 0, 0)),
-    isVip: false,
-    totalAmount: 300,
-    status: "active",
-    createdAt: new Date(),
-  },
-  {
-    id: "king-4",
-    roomId: "room-10",
-    phone: "+966 53 222 66 00",
-    startTime: new Date(new Date().setHours(20, 52, 0, 0)),
-    endTime: new Date(new Date().setHours(21, 52, 0, 0)),
-    isVip: false,
-    totalAmount: 80,
-    status: "active",
-    createdAt: new Date(),
+    createdAt: now,
   },
   {
     id: "king-5",
     roomId: "room-6",
     phone: "+966 54 999 01 01",
+    clientName: "Khalid Al-Qahtani",
     startTime: new Date(new Date().setHours(23, 22, 0, 0)),
     endTime: new Date(new Date().setHours(0, 22, 0, 0)),
     isVip: false,
     totalAmount: 100,
     status: "confirmed",
-    createdAt: new Date(),
+    createdAt: now,
   },
 ];
 
@@ -225,13 +208,16 @@ const statusOrder: Record<RoomStatus, number> = {
   cleaning: 4,
 };
 
-function isToday(date: Date) {
-  const today = new Date();
-  return date.toDateString() === today.toDateString();
-}
+const durationOptions: Array<{ value: DurationPreset; label: string; minutes: number }> = [
+  { value: "30", label: "30 minut", minutes: 30 },
+  { value: "45", label: "45 minut", minutes: 45 },
+  { value: "60", label: "1 soat", minutes: 60 },
+  { value: "120", label: "2 soat", minutes: 120 },
+  { value: "180", label: "3 soat", minutes: 180 },
+];
 
-function diffHours(start: Date, end: Date) {
-  return Math.max((end.getTime() - start.getTime()) / 1000 / 60 / 60, 0);
+function isToday(date: Date) {
+  return date.toDateString() === new Date().toDateString();
 }
 
 function generateBookingId() {
@@ -250,13 +236,47 @@ function getRoomStatusText(status: RoomStatus) {
 }
 
 function getBookingStatusText(status: BookingStatus) {
-  if (status === "active") return "Active";
   if (status === "confirmed") return "Confirmed";
   return "Completed";
 }
 
+function addMinutes(date: Date, minutes: number) {
+  return new Date(date.getTime() + minutes * 60 * 1000);
+}
+
+function getDurationMinutes(value: DurationPreset) {
+  return durationOptions.find((item) => item.value === value)?.minutes ?? 60;
+}
+
+function formatRemainingTime(end: Date | null | undefined) {
+  if (!end) return "Cheklanmagan";
+  const diff = end.getTime() - Date.now();
+
+  if (diff <= 0) return "Vaqti tugagan";
+
+  const totalMinutes = Math.floor(diff / 1000 / 60);
+  const hours = Math.floor(totalMinutes / 60);
+  const minutes = totalMinutes % 60;
+
+  if (hours > 0 && minutes > 0) return `${hours} soat ${minutes} min qoldi`;
+  if (hours > 0) return `${hours} soat qoldi`;
+  return `${minutes} min qoldi`;
+}
+
+function getSessionAmount(pricePerHour: number, minutes: number) {
+  return Number(((pricePerHour / 60) * minutes).toFixed(2));
+}
+
+function buildDateFromTime(time: string) {
+  const base = new Date();
+  const [hh, mm] = time.split(":").map(Number);
+  const result = new Date(base);
+  result.setHours(hh || 0, mm || 0, 0, 0);
+  return result;
+}
+
 /* =========================
-   SMALL UI PARTS
+   UI PARTS
 ========================= */
 
 function GlassCard({
@@ -268,9 +288,14 @@ function GlassCard({
 }) {
   return (
     <div
-      className={`relative overflow-hidden rounded-[28px] border border-white/10 bg-white/[0.05] shadow-[0_20px_80px_rgba(0,0,0,0.35)] backdrop-blur-2xl ${className}`}
+      className={[
+        "relative overflow-hidden rounded-[28px] border backdrop-blur-2xl transition-colors",
+        "border-slate-200/70 bg-white/70 shadow-[0_20px_80px_rgba(15,23,42,0.08)]",
+        "dark:border-white/10 dark:bg-white/[0.05] dark:shadow-[0_20px_80px_rgba(0,0,0,0.35)]",
+        className,
+      ].join(" ")}
     >
-      <div className="absolute inset-0 bg-gradient-to-br from-white/10 via-white/[0.03] to-transparent" />
+      <div className="absolute inset-0 bg-gradient-to-br from-white/40 via-white/10 to-transparent dark:from-white/10 dark:via-white/[0.03] dark:to-transparent" />
       <div className="absolute inset-x-0 top-0 h-px bg-gradient-to-r from-fuchsia-400/70 via-violet-300/50 to-cyan-300/70" />
       <div className="relative">{children}</div>
     </div>
@@ -291,25 +316,25 @@ function StatCard({
   tone?: "cyan" | "green" | "red" | "blue" | "violet" | "yellow";
 }) {
   const toneMap: Record<string, string> = {
-    cyan: "from-cyan-500/25 to-cyan-400/10 text-cyan-300 border-cyan-400/20",
+    cyan: "from-cyan-500/25 to-cyan-400/10 text-cyan-500 dark:text-cyan-300 border-cyan-400/20",
     green:
-      "from-emerald-500/25 to-emerald-400/10 text-emerald-300 border-emerald-400/20",
-    red: "from-rose-500/25 to-rose-400/10 text-rose-300 border-rose-400/20",
-    blue: "from-blue-500/25 to-blue-400/10 text-blue-300 border-blue-400/20",
+      "from-emerald-500/25 to-emerald-400/10 text-emerald-500 dark:text-emerald-300 border-emerald-400/20",
+    red: "from-rose-500/25 to-rose-400/10 text-rose-500 dark:text-rose-300 border-rose-400/20",
+    blue: "from-blue-500/25 to-blue-400/10 text-blue-500 dark:text-blue-300 border-blue-400/20",
     violet:
-      "from-violet-500/25 to-fuchsia-400/10 text-fuchsia-200 border-fuchsia-400/20",
+      "from-violet-500/25 to-fuchsia-400/10 text-fuchsia-500 dark:text-fuchsia-200 border-fuchsia-400/20",
     yellow:
-      "from-amber-500/25 to-yellow-400/10 text-yellow-200 border-yellow-400/20",
+      "from-amber-500/25 to-yellow-400/10 text-yellow-500 dark:text-yellow-200 border-yellow-400/20",
   };
 
   return (
     <GlassCard className="p-5">
       <div className="flex items-start justify-between gap-4">
         <div>
-          <p className="text-sm text-slate-300/80">{title}</p>
-          <h3 className="mt-3 text-3xl font-bold text-white">{value}</h3>
+          <p className="text-sm text-slate-600 dark:text-slate-300/80">{title}</p>
+          <h3 className="mt-3 text-3xl font-bold text-slate-900 dark:text-white">{value}</h3>
           {subtitle && (
-            <p className="mt-2 text-xs text-emerald-300">{subtitle}</p>
+            <p className="mt-2 text-xs text-emerald-600 dark:text-emerald-300">{subtitle}</p>
           )}
         </div>
 
@@ -333,15 +358,14 @@ function StatusBadge({
   const map =
     type === "room"
       ? {
-          free: "border-emerald-400/20 bg-emerald-500/15 text-emerald-300",
-          booked: "border-blue-400/20 bg-blue-500/15 text-blue-300",
-          occupied: "border-rose-400/20 bg-rose-500/15 text-rose-300",
-          cleaning: "border-amber-400/20 bg-amber-500/15 text-amber-300",
+          free: "border-emerald-400/30 bg-emerald-500/15 text-emerald-700 dark:text-emerald-300",
+          booked: "border-blue-400/30 bg-blue-500/15 text-blue-700 dark:text-blue-300",
+          occupied: "border-rose-400/30 bg-rose-500/15 text-rose-700 dark:text-rose-300",
+          cleaning: "border-amber-400/30 bg-amber-500/15 text-amber-700 dark:text-amber-300",
         }
       : {
-          active: "border-emerald-400/20 bg-emerald-500/15 text-emerald-300",
-          confirmed: "border-blue-400/20 bg-blue-500/15 text-blue-300",
-          completed: "border-slate-400/20 bg-slate-500/15 text-slate-300",
+          confirmed: "border-blue-400/30 bg-blue-500/15 text-blue-700 dark:text-blue-300",
+          completed: "border-slate-400/30 bg-slate-500/15 text-slate-700 dark:text-slate-300",
         };
 
   return (
@@ -365,30 +389,26 @@ export function Dashboard() {
   const [showAllRooms, setShowAllRooms] = useState(false);
 
   const [selectedRoom, setSelectedRoom] = useState<Room | null>(null);
+
   const [sessionModalOpen, setSessionModalOpen] = useState(false);
+  const [occupiedModalOpen, setOccupiedModalOpen] = useState(false);
   const [newBookingModalOpen, setNewBookingModalOpen] = useState(false);
 
-  // session form
-  const [sessionPhone, setSessionPhone] = useState("");
-  const [sessionStart, setSessionStart] = useState(format(new Date(), "HH:mm"));
-  const [sessionEnd, setSessionEnd] = useState("");
   const [sessionVip, setSessionVip] = useState(false);
+  const [sessionDuration, setSessionDuration] = useState<DurationPreset>("60");
 
-  // booking form
   const [bookingPhone, setBookingPhone] = useState("");
+  const [bookingClientName, setBookingClientName] = useState("");
   const [bookingRoomId, setBookingRoomId] = useState(initialRooms[0]?.id ?? "");
   const [bookingStart, setBookingStart] = useState(format(new Date(), "HH:mm"));
-  const [bookingEnd, setBookingEnd] = useState("");
   const [bookingVip, setBookingVip] = useState(false);
+  const [bookingDuration, setBookingDuration] = useState<DurationPreset>("60");
 
   const todayStartedCount = useMemo(() => {
-    return bookings.filter((b) => isToday(b.startTime)).length;
-  }, [bookings]);
+    return rooms.filter((room) => room.sessionStart && isToday(room.sessionStart)).length;
+  }, [rooms]);
 
-  const freeCount = useMemo(
-    () => rooms.filter((r) => r.status === "free").length,
-    [rooms]
-  );
+  const freeCount = useMemo(() => rooms.filter((r) => r.status === "free").length, [rooms]);
 
   const occupiedCount = useMemo(
     () => rooms.filter((r) => r.status === "occupied").length,
@@ -403,10 +423,25 @@ export function Dashboard() {
   const totalRooms = rooms.length;
 
   const todayRevenue = useMemo(() => {
-    return bookings
+    const roomRevenue = rooms.reduce((sum, room) => {
+      if (room.status !== "occupied" || !room.sessionStart || !isToday(room.sessionStart)) return sum;
+      if (room.isVip) return sum;
+      if (!room.occupiedUntil) return sum;
+
+      const totalMinutes = Math.max(
+        Math.floor((room.occupiedUntil.getTime() - room.sessionStart.getTime()) / 1000 / 60),
+        0
+      );
+
+      return sum + getSessionAmount(room.pricePerHour, totalMinutes);
+    }, 0);
+
+    const bookingRevenue = bookings
       .filter((b) => isToday(b.startTime))
       .reduce((sum, b) => sum + b.totalAmount, 0);
-  }, [bookings]);
+
+    return roomRevenue + bookingRevenue;
+  }, [rooms, bookings]);
 
   const sortedRooms = useMemo(() => {
     return [...rooms].sort((a, b) => {
@@ -428,125 +463,111 @@ export function Dashboard() {
     return rooms.filter((r) => r.status === "free" || r.status === "booked");
   }, [rooms]);
 
-  function resetSessionForm(room?: Room) {
-    setSelectedRoom(room ?? null);
-    setSessionPhone("");
-    setSessionStart(format(new Date(), "HH:mm"));
-    setSessionEnd("");
+  function resetSessionForm() {
     setSessionVip(false);
+    setSessionDuration("60");
   }
 
   function resetBookingForm() {
     const firstAvailable = freeOrBookedRooms[0]?.id ?? rooms[0]?.id ?? "";
     setBookingPhone("");
+    setBookingClientName("");
     setBookingRoomId(firstAvailable);
     setBookingStart(format(new Date(), "HH:mm"));
-    setBookingEnd("");
     setBookingVip(false);
+    setBookingDuration("60");
   }
 
-  function openRoomModal(room: Room) {
+  function openRoom(room: Room) {
     setSelectedRoom(room);
-    resetSessionForm(room);
-    setSessionModalOpen(true);
-  }
 
-  function handleSetNowForSession() {
-    setSessionStart(format(new Date(), "HH:mm"));
-  }
+    if (room.status === "free" || room.status === "booked") {
+      resetSessionForm();
+      setSessionModalOpen(true);
+      return;
+    }
 
-  function handleSetNowForBooking() {
-    setBookingStart(format(new Date(), "HH:mm"));
+    if (room.status === "occupied") {
+      setOccupiedModalOpen(true);
+      return;
+    }
   }
 
   function handleCreateSession() {
     if (!selectedRoom) return;
-    if (!sessionPhone.trim()) return;
 
-    const now = new Date();
-    const [sh, sm] = sessionStart.split(":").map(Number);
-    const startDate = new Date(now);
-    startDate.setHours(sh || 0, sm || 0, 0, 0);
+    const startDate = new Date();
 
     let endDate: Date | null = null;
-    let amount = 0;
-
     if (!sessionVip) {
-      if (!sessionEnd) return;
-      const [eh, em] = sessionEnd.split(":").map(Number);
-      endDate = new Date(now);
-      endDate.setHours(eh || 0, em || 0, 0, 0);
-
-      if (endDate <= startDate) {
-        endDate.setDate(endDate.getDate() + 1);
-      }
-
-      const hours = diffHours(startDate, endDate);
-      amount = Number((hours * selectedRoom.pricePerHour).toFixed(2));
+      const minutes = getDurationMinutes(sessionDuration);
+      endDate = addMinutes(startDate, minutes);
     }
 
-    const newBooking: Booking = {
-      id: generateBookingId(),
-      roomId: selectedRoom.id,
-      phone: sessionPhone,
-      startTime: startDate,
-      endTime: endDate,
-      isVip: sessionVip,
-      totalAmount: amount,
-      status: "active",
-      createdAt: new Date(),
-    };
-
-    setBookings((prev) => [newBooking, ...prev]);
     setRooms((prev) =>
       prev.map((room) =>
         room.id === selectedRoom.id
           ? {
               ...room,
               status: "occupied",
-              occupiedUntil: sessionVip ? null : endDate,
+              sessionStart: startDate,
+              occupiedUntil: endDate,
               bookedFor: null,
+              isVip: sessionVip,
             }
           : room
       )
     );
 
     setSessionModalOpen(false);
+    setSelectedRoom(null);
     resetSessionForm();
   }
 
+  function handleFinishSession() {
+    if (!selectedRoom) return;
+
+    setRooms((prev) =>
+      prev.map((room) =>
+        room.id === selectedRoom.id
+          ? {
+              ...room,
+              status: "free",
+              sessionStart: null,
+              occupiedUntil: null,
+              bookedFor: null,
+              isVip: false,
+            }
+          : room
+      )
+    );
+
+    setOccupiedModalOpen(false);
+    setSelectedRoom(null);
+  }
+
   function handleCreatePreBooking() {
-    if (!bookingPhone.trim() || !bookingRoomId) return;
+    if (!bookingPhone.trim() || !bookingClientName.trim() || !bookingRoomId) return;
 
     const targetRoom = rooms.find((r) => r.id === bookingRoomId);
     if (!targetRoom) return;
 
-    const now = new Date();
-    const [sh, sm] = bookingStart.split(":").map(Number);
-    const startDate = new Date(now);
-    startDate.setHours(sh || 0, sm || 0, 0, 0);
+    const startDate = buildDateFromTime(bookingStart);
 
     let endDate: Date | null = null;
     let amount = 0;
 
     if (!bookingVip) {
-      if (!bookingEnd) return;
-      const [eh, em] = bookingEnd.split(":").map(Number);
-      endDate = new Date(now);
-      endDate.setHours(eh || 0, em || 0, 0, 0);
-
-      if (endDate <= startDate) {
-        endDate.setDate(endDate.getDate() + 1);
-      }
-
-      const hours = diffHours(startDate, endDate);
-      amount = Number((hours * targetRoom.pricePerHour).toFixed(2));
+      const minutes = getDurationMinutes(bookingDuration);
+      endDate = addMinutes(startDate, minutes);
+      amount = getSessionAmount(targetRoom.pricePerHour, minutes);
     }
 
     const newBooking: Booking = {
       id: generateBookingId(),
       roomId: bookingRoomId,
       phone: bookingPhone,
+      clientName: bookingClientName,
       startTime: startDate,
       endTime: endDate,
       isVip: bookingVip,
@@ -572,303 +593,299 @@ export function Dashboard() {
     resetBookingForm();
   }
 
+  const selectedRoomAmount = useMemo(() => {
+    if (!selectedRoom || sessionVip) return "VIP";
+    const minutes = getDurationMinutes(sessionDuration);
+    return formatMoney(getSessionAmount(selectedRoom.pricePerHour, minutes));
+  }, [selectedRoom, sessionVip, sessionDuration]);
+
+  const selectedBookingAmount = useMemo(() => {
+    const room = rooms.find((r) => r.id === bookingRoomId);
+    if (!room || bookingVip) return "VIP";
+    const minutes = getDurationMinutes(bookingDuration);
+    return formatMoney(getSessionAmount(room.pricePerHour, minutes));
+  }, [rooms, bookingRoomId, bookingVip, bookingDuration]);
+
   return (
-    <div className="relative min-h-screen overflow-hidden bg-[#050816] p-4 sm:p-6">
-      {/* Background */}
-      <div className="pointer-events-none absolute inset-0 bg-gradient-to-br from-[#16001f] via-[#050816] to-[#031a24]" />
-      <div className="pointer-events-none absolute -left-24 top-[-80px] h-72 w-72 rounded-full bg-fuchsia-600/25 blur-3xl" />
-      <div className="pointer-events-none absolute right-[-60px] top-1/4 h-80 w-80 rounded-full bg-cyan-500/20 blur-3xl" />
-      <div className="pointer-events-none absolute bottom-[-80px] left-1/3 h-72 w-72 rounded-full bg-violet-500/20 blur-3xl" />
-      <div className="pointer-events-none absolute inset-0 bg-[linear-gradient(rgba(255,255,255,0.03)_1px,transparent_1px),linear-gradient(90deg,rgba(255,255,255,0.03)_1px,transparent_1px)] bg-[size:42px_42px] opacity-20" />
+    <div className="min-h-screen bg-white text-slate-900 transition-colors dark:bg-[#050816] dark:text-white">
+      <div className="relative min-h-screen overflow-hidden p-4 sm:p-6">
+        {/* Background */}
+        <div className="pointer-events-none absolute inset-0 bg-gradient-to-br from-fuchsia-100/60 via-white to-cyan-100/50 dark:from-[#16001f] dark:via-[#050816] dark:to-[#031a24]" />
+        <div className="pointer-events-none absolute -left-24 top-[-80px] h-72 w-72 rounded-full bg-fuchsia-500/15 blur-3xl dark:bg-fuchsia-600/25" />
+        <div className="pointer-events-none absolute right-[-60px] top-1/4 h-80 w-80 rounded-full bg-cyan-400/15 blur-3xl dark:bg-cyan-500/20" />
+        <div className="pointer-events-none absolute bottom-[-80px] left-1/3 h-72 w-72 rounded-full bg-violet-400/15 blur-3xl dark:bg-violet-500/20" />
+        <div className="pointer-events-none absolute inset-0 bg-[linear-gradient(rgba(15,23,42,0.03)_1px,transparent_1px),linear-gradient(90deg,rgba(15,23,42,0.03)_1px,transparent_1px)] dark:bg-[linear-gradient(rgba(255,255,255,0.03)_1px,transparent_1px),linear-gradient(90deg,rgba(255,255,255,0.03)_1px,transparent_1px)] bg-[size:42px_42px] opacity-30 dark:opacity-20" />
 
-      <div className="relative space-y-6">
-        {/* Header */}
-        <div className="flex flex-col gap-4 lg:flex-row lg:items-end lg:justify-between">
-          <div>
-            <h1 className="bg-gradient-to-r from-white via-fuchsia-100 to-cyan-100 bg-clip-text text-3xl font-bold text-transparent sm:text-4xl">
-              Dashboard
-            </h1>
-            <p className="mt-2 text-sm text-slate-300/80">
-              Bugungi holat shu yerda. Qisqasi, kassaga nima tushdi, qaysi xona
-              bo‘sh — hammasi ko‘z oldingda.
-            </p>
-          </div>
-
-          <Button
-            onClick={() => {
-              resetBookingForm();
-              setNewBookingModalOpen(true);
-            }}
-            className="h-12 rounded-2xl border border-white/10 bg-gradient-to-r from-fuchsia-500 via-violet-400 to-cyan-400 px-5 font-semibold text-white shadow-[0_10px_30px_rgba(34,211,238,0.18)] transition-all duration-300 hover:scale-[1.01] hover:from-fuchsia-400 hover:via-violet-300 hover:to-cyan-300"
-          >
-            <Plus className="mr-2 h-4 w-4" />
-            Buyurtma qo‘shish
-          </Button>
-        </div>
-
-        {/* Stats */}
-        <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-3 2xl:grid-cols-6">
-          <StatCard
-            title="Bugun boshlangan sessionlar"
-            value={todayStartedCount}
-            subtitle="Bugungi ishlagan xonalar soni"
-            icon={Clock3}
-            tone="cyan"
-          />
-          <StatCard
-            title="Hozir bo‘sh xonalar"
-            value={freeCount}
-            icon={CheckCircle2}
-            tone="green"
-          />
-          <StatCard
-            title="Hozir band xonalar"
-            value={occupiedCount}
-            icon={Gamepad2}
-            tone="red"
-          />
-          <StatCard
-            title="Oldindan buyurtirilgan"
-            value={bookedCount}
-            icon={CalendarCheck}
-            tone="blue"
-          />
-          <StatCard
-            title="Umumiy xonalar"
-            value={totalRooms}
-            icon={Sparkles}
-            tone="violet"
-          />
-          <StatCard
-            title="Bugungi tushum"
-            value={formatMoney(todayRevenue)}
-            subtitle="Hozircha yomon emas"
-            icon={DollarSign}
-            tone="yellow"
-          />
-        </div>
-
-        {/* Rooms */}
-        <GlassCard className="p-6">
-          <div className="mb-6 flex items-center justify-between gap-4">
+        <div className="relative space-y-6">
+          {/* Header */}
+          <div className="flex flex-col gap-4 lg:flex-row lg:items-end lg:justify-between">
             <div>
-              <h2 className="text-2xl font-bold text-white">Xonalar holati</h2>
-              <p className="mt-1 text-sm text-slate-400">
-                Avval bo‘sh, keyin buyurtirilgan, undan keyin band xonalar
-                chiqadi.
+              <h1 className="bg-gradient-to-r from-slate-900 via-fuchsia-700 to-cyan-700 bg-clip-text text-3xl font-bold text-transparent dark:from-white dark:via-fuchsia-100 dark:to-cyan-100 sm:text-4xl">
+                Dashboard
+              </h1>
+              <p className="mt-2 text-sm text-slate-600 dark:text-slate-300/80">
+                Bugungi holat shu yerda. Kassaga nima tushdi, qaysi xona bo‘sh —
+                hammasi ko‘z oldingda.
               </p>
             </div>
-            <TrendingUp className="h-5 w-5 text-fuchsia-300" />
+
+            <Button
+              onClick={() => {
+                resetBookingForm();
+                setNewBookingModalOpen(true);
+              }}
+              className="h-12 rounded-2xl border border-white/10 bg-gradient-to-r from-fuchsia-500 via-violet-400 to-cyan-400 px-5 font-semibold text-white shadow-[0_10px_30px_rgba(34,211,238,0.18)] transition-all duration-300 hover:scale-[1.01] hover:from-fuchsia-400 hover:via-violet-300 hover:to-cyan-300"
+            >
+              <Plus className="mr-2 h-4 w-4" />
+              Buyurtma qo‘shish
+            </Button>
           </div>
 
-          <div className="grid grid-cols-1 gap-4 md:grid-cols-2 2xl:grid-cols-4">
-            {visibleRooms.map((room) => (
-              <button
-                key={room.id}
-                type="button"
-                onClick={() => openRoomModal(room)}
-                className="group relative overflow-hidden rounded-[24px] border border-white/10 bg-white/[0.04] p-5 text-left backdrop-blur-xl transition-all duration-300 hover:border-fuchsia-400/30 hover:bg-white/[0.06] hover:shadow-[0_12px_40px_rgba(168,85,247,0.12)]"
-              >
-                <div className="absolute inset-0 bg-gradient-to-br from-white/8 via-transparent to-transparent opacity-70" />
+          {/* Stats */}
+          <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-3 2xl:grid-cols-6">
+            <StatCard
+              title="Bugun boshlangan sessionlar"
+              value={todayStartedCount}
+              subtitle="Bugungi ishlagan xonalar soni"
+              icon={Clock3}
+              tone="cyan"
+            />
+            <StatCard
+              title="Hozir bo‘sh xonalar"
+              value={freeCount}
+              icon={CheckCircle2}
+              tone="green"
+            />
+            <StatCard
+              title="Hozir band xonalar"
+              value={occupiedCount}
+              icon={Gamepad2}
+              tone="red"
+            />
+            <StatCard
+              title="Oldindan buyurtirilgan"
+              value={bookedCount}
+              icon={CalendarCheck}
+              tone="blue"
+            />
+            <StatCard
+              title="Umumiy xonalar"
+              value={totalRooms}
+              icon={Sparkles}
+              tone="violet"
+            />
+            <StatCard
+              title="Bugungi tushum"
+              value={formatMoney(todayRevenue)}
+              subtitle="Hozircha yomon emas"
+              icon={DollarSign}
+              tone="yellow"
+            />
+          </div>
 
-                <div className="relative flex items-start justify-between gap-3">
-                  <div>
-                    <h3 className="text-lg font-semibold text-white">
-                      {room.name}
-                    </h3>
-                    <p className="mt-1 text-xs uppercase tracking-[0.16em] text-slate-400">
-                      {room.deviceLabel}
+          {/* Rooms */}
+          <GlassCard className="p-6">
+            <div className="mb-6 flex items-center justify-between gap-4">
+              <div>
+                <h2 className="text-2xl font-bold text-slate-900 dark:text-white">
+                  Xonalar holati
+                </h2>
+                <p className="mt-1 text-sm text-slate-600 dark:text-slate-400">
+                  Avval bo‘sh, keyin buyurtirilgan, undan keyin band xonalar chiqadi.
+                </p>
+              </div>
+              <TrendingUp className="h-5 w-5 text-fuchsia-500 dark:text-fuchsia-300" />
+            </div>
+
+            <div className="grid grid-cols-1 gap-4 md:grid-cols-2 2xl:grid-cols-4">
+              {visibleRooms.map((room) => (
+                <button
+                  key={room.id}
+                  type="button"
+                  onClick={() => openRoom(room)}
+                  className={[
+                    "group relative overflow-hidden rounded-[24px] border p-5 text-left backdrop-blur-xl transition-all duration-300",
+                    "border-slate-200/70 bg-white/50 hover:border-fuchsia-300/60 hover:bg-white/70 hover:shadow-[0_12px_40px_rgba(168,85,247,0.08)]",
+                    "dark:border-white/10 dark:bg-white/[0.04] dark:hover:border-fuchsia-400/30 dark:hover:bg-white/[0.06] dark:hover:shadow-[0_12px_40px_rgba(168,85,247,0.12)]",
+                  ].join(" ")}
+                >
+                  <div className="absolute inset-0 bg-gradient-to-br from-white/40 via-transparent to-transparent opacity-70 dark:from-white/8" />
+
+                  <div className="relative flex items-start justify-between gap-3">
+                    <div>
+                      <h3 className="text-lg font-semibold text-slate-900 dark:text-white">
+                        {room.name}
+                      </h3>
+                      <p className="mt-1 text-xs uppercase tracking-[0.16em] text-slate-500 dark:text-slate-400">
+                        {room.deviceLabel}
+                      </p>
+                    </div>
+
+                    <div className="flex h-11 w-11 items-center justify-center rounded-2xl border border-slate-200/70 bg-white/60 dark:border-white/10 dark:bg-white/10">
+                      {room.kind === "pc" ? (
+                        <Monitor className="h-5 w-5 text-cyan-500 dark:text-cyan-300" />
+                      ) : (
+                        <Gamepad2 className="h-5 w-5 text-fuchsia-500 dark:text-fuchsia-300" />
+                      )}
+                    </div>
+                  </div>
+
+                  <div className="relative mt-4 flex items-center justify-between">
+                    <StatusBadge status={room.status} type="room" />
+                    <p className="text-sm font-medium text-slate-700 dark:text-slate-300">
+                      SAR {room.pricePerHour}/soat
                     </p>
                   </div>
 
-                  <div className="flex h-11 w-11 items-center justify-center rounded-2xl border border-white/10 bg-white/10">
-                    {room.kind === "pc" ? (
-                      <Monitor className="h-5 w-5 text-cyan-300" />
-                    ) : (
-                      <Gamepad2 className="h-5 w-5 text-fuchsia-300" />
-                    )}
-                  </div>
-                </div>
+                  {room.status === "occupied" && (
+                    <div className="relative mt-3 space-y-1 text-sm text-slate-600 dark:text-slate-400">
+                      {room.isVip ? (
+                        <>
+                          <p className="font-medium text-fuchsia-600 dark:text-fuchsia-300">
+                            VIP
+                          </p>
+                          {room.sessionStart && (
+                            <p>Boshlangan: {format(room.sessionStart, "HH:mm")}</p>
+                          )}
+                        </>
+                      ) : (
+                        <>
+                          {room.sessionStart && room.occupiedUntil && (
+                            <p>
+                              {format(room.sessionStart, "HH:mm")} -{" "}
+                              {format(room.occupiedUntil, "HH:mm")}
+                            </p>
+                          )}
+                          <p>{formatRemainingTime(room.occupiedUntil)}</p>
+                        </>
+                      )}
+                    </div>
+                  )}
 
-                <div className="relative mt-4 flex items-center justify-between">
-                  <StatusBadge status={room.status} type="room" />
-                  <p className="text-sm font-medium text-slate-300">
-                    SAR {room.pricePerHour}/soat
-                  </p>
-                </div>
+                  {room.status === "booked" && room.bookedFor && (
+                    <p className="relative mt-3 text-sm text-slate-600 dark:text-slate-400">
+                      Kelishi kutilmoqda: {format(room.bookedFor, "HH:mm")}
+                    </p>
+                  )}
 
-                {room.status === "occupied" && room.occupiedUntil && (
-                  <p className="relative mt-3 text-sm text-slate-400">
-                    Tugaydi: {format(room.occupiedUntil, "HH:mm")}
-                  </p>
-                )}
+                  {room.status === "free" && (
+                    <p className="relative mt-3 text-sm text-emerald-600 dark:text-emerald-300">
+                      Hozir odam qo‘yish mumkin
+                    </p>
+                  )}
 
-                {room.status === "booked" && room.bookedFor && (
-                  <p className="relative mt-3 text-sm text-slate-400">
-                    Kelishi kutilmoqda: {format(room.bookedFor, "HH:mm")}
-                  </p>
-                )}
-
-                {room.status === "free" && (
-                  <p className="relative mt-3 text-sm text-emerald-300">
-                    Hozir odam qo‘yish mumkin
-                  </p>
-                )}
-
-                {room.status === "cleaning" && (
-                  <p className="relative mt-3 text-sm text-amber-300">
-                    Hozircha texnik pauza
-                  </p>
-                )}
-              </button>
-            ))}
-          </div>
-
-          {sortedRooms.length > 8 && (
-            <div className="mt-5 flex justify-center">
-              <Button
-                variant="outline"
-                onClick={() => setShowAllRooms((prev) => !prev)}
-                className="rounded-2xl border-white/10 bg-white/5 text-slate-200 backdrop-blur-xl hover:bg-white/10 hover:text-white"
-              >
-                {showAllRooms ? "Kamroq ko‘rish" : "Ko‘proq ko‘rish"}
-              </Button>
+                  {room.status === "cleaning" && (
+                    <p className="relative mt-3 text-sm text-amber-600 dark:text-amber-300">
+                      Hozircha texnik pauza
+                    </p>
+                  )}
+                </button>
+              ))}
             </div>
-          )}
-        </GlassCard>
 
-        {/* Bookings table */}
-        <GlassCard className="p-6">
-          <div className="mb-6 flex items-center justify-between gap-4">
-            <div>
-              <h2 className="text-2xl font-bold text-white">
-                Buyurtmalar ro‘yxati
-              </h2>
-              <p className="mt-1 text-sm text-slate-400">
-                Bu yerda endi ism emas, telefon raqam chiqadi. To‘g‘risi ham shu,
-                receptionistga ko‘proq kerak bo‘ladigani shu-da.
-              </p>
+            {sortedRooms.length > 8 && (
+              <div className="mt-5 flex justify-center">
+                <Button
+                  variant="outline"
+                  onClick={() => setShowAllRooms((prev) => !prev)}
+                  className="rounded-2xl border-slate-200 bg-white/70 text-slate-700 hover:bg-white dark:border-white/10 dark:bg-white/5 dark:text-slate-200 dark:hover:bg-white/10 dark:hover:text-white"
+                >
+                  {showAllRooms ? "Kamroq ko‘rish" : "Ko‘proq ko‘rish"}
+                </Button>
+              </div>
+            )}
+          </GlassCard>
+
+          {/* Bookings table */}
+          <GlassCard className="p-6">
+            <div className="mb-6 flex items-center justify-between gap-4">
+              <div>
+                <h2 className="text-2xl font-bold text-slate-900 dark:text-white">
+                  Buyurtmalar ro‘yxati
+                </h2>
+                <p className="mt-1 text-sm text-slate-600 dark:text-slate-400">
+                  Bu yerda faqat oldindan bronlar turadi.
+                </p>
+              </div>
             </div>
-          </div>
 
-          <div className="overflow-x-auto rounded-2xl border border-white/10 bg-black/10">
-            <Table>
-              <TableHeader>
-                <TableRow className="border-white/10 hover:bg-white/[0.03]">
-                  <TableHead className="text-slate-300">Booking ID</TableHead>
-                  <TableHead className="text-slate-300">Room</TableHead>
-                  <TableHead className="text-slate-300">Telefon</TableHead>
-                  <TableHead className="text-slate-300">Vaqt</TableHead>
-                  <TableHead className="text-slate-300">Amount</TableHead>
-                  <TableHead className="text-slate-300">Status</TableHead>
-                </TableRow>
-              </TableHeader>
+            <div className="overflow-x-auto rounded-2xl border border-slate-200 bg-white/40 dark:border-white/10 dark:bg-black/10">
+              <Table>
+                <TableHeader>
+                  <TableRow className="border-slate-200 hover:bg-slate-50 dark:border-white/10 dark:hover:bg-white/[0.03]">
+                    <TableHead className="text-slate-600 dark:text-slate-300">Booking ID</TableHead>
+                    <TableHead className="text-slate-600 dark:text-slate-300">Room</TableHead>
+                    <TableHead className="text-slate-600 dark:text-slate-300">Ism</TableHead>
+                    <TableHead className="text-slate-600 dark:text-slate-300">Telefon</TableHead>
+                    <TableHead className="text-slate-600 dark:text-slate-300">Vaqt</TableHead>
+                    <TableHead className="text-slate-600 dark:text-slate-300">Amount</TableHead>
+                    <TableHead className="text-slate-600 dark:text-slate-300">Status</TableHead>
+                  </TableRow>
+                </TableHeader>
 
-              <TableBody>
-                {recentBookings.map((booking) => {
-                  const room = rooms.find((r) => r.id === booking.roomId);
+                <TableBody>
+                  {recentBookings.map((booking) => {
+                    const room = rooms.find((r) => r.id === booking.roomId);
 
-                  return (
-                    <TableRow
-                      key={booking.id}
-                      className="border-white/10 hover:bg-white/[0.03]"
-                    >
-                      <TableCell className="text-slate-200">
-                        #{booking.id}
-                      </TableCell>
-
-                      <TableCell className="text-slate-200">
-                        {room?.name ?? "-"}
-                      </TableCell>
-
-                      <TableCell className="text-slate-200">
-                        {booking.phone}
-                      </TableCell>
-
-                      <TableCell className="text-slate-200">
-                        {format(booking.startTime, "HH:mm")}
-                        {" - "}
-                        {booking.isVip
-                          ? "VIP"
-                          : booking.endTime
-                          ? format(booking.endTime, "HH:mm")
-                          : "-"}
-                      </TableCell>
-
-                      <TableCell className="text-slate-200">
-                        {booking.isVip ? "VIP" : formatMoney(booking.totalAmount)}
-                      </TableCell>
-
-                      <TableCell>
-                        <StatusBadge status={booking.status} type="booking" />
-                      </TableCell>
-                    </TableRow>
-                  );
-                })}
-              </TableBody>
-            </Table>
-          </div>
-        </GlassCard>
+                    return (
+                      <TableRow
+                        key={booking.id}
+                        className="border-slate-200 hover:bg-slate-50 dark:border-white/10 dark:hover:bg-white/[0.03]"
+                      >
+                        <TableCell className="text-slate-800 dark:text-slate-200">
+                          #{booking.id}
+                        </TableCell>
+                        <TableCell className="text-slate-800 dark:text-slate-200">
+                          {room?.name ?? "-"}
+                        </TableCell>
+                        <TableCell className="text-slate-800 dark:text-slate-200">
+                          {booking.clientName}
+                        </TableCell>
+                        <TableCell className="text-slate-800 dark:text-slate-200">
+                          {booking.phone}
+                        </TableCell>
+                        <TableCell className="text-slate-800 dark:text-slate-200">
+                          {format(booking.startTime, "HH:mm")} -{" "}
+                          {booking.isVip
+                            ? "VIP"
+                            : booking.endTime
+                            ? format(booking.endTime, "HH:mm")
+                            : "-"}
+                        </TableCell>
+                        <TableCell className="text-slate-800 dark:text-slate-200">
+                          {booking.isVip ? "VIP" : formatMoney(booking.totalAmount)}
+                        </TableCell>
+                        <TableCell>
+                          <StatusBadge status={booking.status} type="booking" />
+                        </TableCell>
+                      </TableRow>
+                    );
+                  })}
+                </TableBody>
+              </Table>
+            </div>
+          </GlassCard>
+        </div>
       </div>
 
-      {/* ROOM SESSION MODAL */}
+      {/* SESSION START MODAL */}
       <Dialog open={sessionModalOpen} onOpenChange={setSessionModalOpen}>
-        <DialogContent className="max-w-xl overflow-hidden rounded-[32px] border border-white/10 bg-[#0a1020]/95 p-0 text-white shadow-[0_20px_80px_rgba(0,0,0,0.55)] backdrop-blur-2xl">
-          <div className="absolute inset-0 bg-gradient-to-br from-white/10 via-transparent to-transparent" />
+        <DialogContent className="max-w-xl rounded-[32px] border border-slate-200 bg-white/95 p-0 text-slate-900 shadow-[0_20px_80px_rgba(15,23,42,0.18)] backdrop-blur-2xl dark:border-white/10 dark:bg-[#0a1020]/95 dark:text-white dark:shadow-[0_20px_80px_rgba(0,0,0,0.55)]">
+          <div className="absolute inset-0 bg-gradient-to-br from-white/50 via-transparent to-transparent dark:from-white/10 dark:via-transparent dark:to-transparent" />
           <div className="h-[2px] w-full bg-gradient-to-r from-fuchsia-400 via-violet-300 to-cyan-300" />
 
           <div className="relative p-6 sm:p-7">
             <DialogHeader>
-              <DialogTitle className="text-2xl font-bold text-white">
+              <DialogTitle className="text-2xl font-bold text-slate-900 dark:text-white">
                 {selectedRoom?.name}
               </DialogTitle>
-              <DialogDescription className="text-slate-400">
-                Odam qo‘yish uchun vaqtni tanlang. Hozir tugmasi bor, VIP ham
-                bor. To‘liq receptionistcha set.
+              <DialogDescription className="text-slate-600 dark:text-slate-400">
+                Hona bo‘shatilgan ekan, endi odam qo‘yish mumkin.
               </DialogDescription>
             </DialogHeader>
 
             <div className="mt-6 space-y-5">
-              <div className="space-y-2">
-                <Label className="text-xs uppercase tracking-[0.18em] text-slate-200/80">
-                  Telefon raqami
-                </Label>
-                <div className="relative">
-                  <Phone className="pointer-events-none absolute left-4 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-400" />
-                  <Input
-                    value={sessionPhone}
-                    onChange={(e) => setSessionPhone(e.target.value)}
-                    placeholder="+966 5X XXX XX XX"
-                    className="h-12 rounded-2xl border border-white/10 bg-white/8 pl-11 text-slate-100 placeholder:text-slate-400 backdrop-blur-xl focus:border-fuchsia-400/60 focus:ring-2 focus:ring-fuchsia-400/20"
-                  />
-                </div>
-              </div>
-
-              <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
-                <div className="space-y-2">
-                  <Label className="text-xs uppercase tracking-[0.18em] text-slate-200/80">
-                    Boshlanish vaqti
-                  </Label>
-                  <Input
-                    type="time"
-                    value={sessionStart}
-                    onChange={(e) => setSessionStart(e.target.value)}
-                    className="h-12 rounded-2xl border border-white/10 bg-white/8 text-slate-100 backdrop-blur-xl focus:border-cyan-400/60 focus:ring-2 focus:ring-cyan-400/20"
-                  />
-                </div>
-
-                <div className="flex items-end">
-                  <Button
-                    type="button"
-                    onClick={handleSetNowForSession}
-                    className="h-12 w-full rounded-2xl border border-white/10 bg-white/8 text-slate-100 hover:bg-white/12"
-                  >
-                    Hozir
-                  </Button>
-                </div>
-              </div>
-
-              <div className="flex items-center gap-3 rounded-2xl border border-white/10 bg-white/[0.05] p-4">
+              <div className="flex items-center gap-3 rounded-2xl border border-slate-200 bg-slate-50/70 p-4 dark:border-white/10 dark:bg-white/[0.05]">
                 <input
                   id="session-vip"
                   type="checkbox"
@@ -877,36 +894,57 @@ export function Dashboard() {
                   className="h-4 w-4 accent-fuchsia-500"
                 />
                 <Label htmlFor="session-vip" className="cursor-pointer text-sm">
-                  VIP qilish — vaqt cheklanmaydi, qachon to‘xtatsa o‘shanda
-                  tugaydi
+                  VIP qilish — vaqt cheklanmaydi
                 </Label>
               </div>
 
               {!sessionVip && (
                 <div className="space-y-2">
-                  <Label className="text-xs uppercase tracking-[0.18em] text-slate-200/80">
-                    Tugash vaqti
+                  <Label className="text-xs uppercase tracking-[0.18em] text-slate-500 dark:text-slate-200/80">
+                    Davomiyligi
                   </Label>
-                  <Input
-                    type="time"
-                    value={sessionEnd}
-                    onChange={(e) => setSessionEnd(e.target.value)}
-                    className="h-12 rounded-2xl border border-white/10 bg-white/8 text-slate-100 backdrop-blur-xl focus:border-cyan-400/60 focus:ring-2 focus:ring-cyan-400/20"
-                  />
+
+                  <div className="grid grid-cols-2 gap-3 sm:grid-cols-5">
+                    {durationOptions.map((item) => {
+                      const isActive = sessionDuration === item.value;
+
+                      return (
+                        <button
+                          key={item.value}
+                          type="button"
+                          onClick={() => setSessionDuration(item.value)}
+                          className={[
+                            "rounded-2xl border px-3 py-3 text-sm font-medium transition-all",
+                            isActive
+                              ? "border-fuchsia-400/40 bg-gradient-to-r from-fuchsia-500/15 to-cyan-500/15 text-fuchsia-600 dark:text-fuchsia-200"
+                              : "border-slate-200 bg-white/70 text-slate-700 hover:bg-slate-50 dark:border-white/10 dark:bg-white/5 dark:text-slate-200 dark:hover:bg-white/10",
+                          ].join(" ")}
+                        >
+                          {item.label}
+                        </button>
+                      );
+                    })}
+                  </div>
                 </div>
               )}
 
-              <div className="rounded-2xl border border-white/10 bg-white/[0.04] p-4 text-sm text-slate-300">
+              <div className="rounded-2xl border border-slate-200 bg-slate-50/70 p-4 text-sm text-slate-700 dark:border-white/10 dark:bg-white/[0.04] dark:text-slate-300">
                 <p>
                   Qurilma turi:{" "}
-                  <span className="font-semibold text-white">
+                  <span className="font-semibold text-slate-900 dark:text-white">
                     {selectedRoom?.deviceLabel}
                   </span>
                 </p>
                 <p className="mt-1">
                   Soatbay narx:{" "}
-                  <span className="font-semibold text-white">
+                  <span className="font-semibold text-slate-900 dark:text-white">
                     SAR {selectedRoom?.pricePerHour ?? 0}
+                  </span>
+                </p>
+                <p className="mt-1">
+                  Session narxi:{" "}
+                  <span className="font-semibold text-slate-900 dark:text-white">
+                    {selectedRoomAmount}
                   </span>
                 </p>
               </div>
@@ -916,7 +954,7 @@ export function Dashboard() {
                   type="button"
                   variant="outline"
                   onClick={() => setSessionModalOpen(false)}
-                  className="h-12 rounded-2xl border-white/10 bg-white/5 text-slate-200 hover:bg-white/10"
+                  className="h-12 rounded-2xl border-slate-200 bg-white text-slate-700 hover:bg-slate-50 dark:border-white/10 dark:bg-white/5 dark:text-slate-200 dark:hover:bg-white/10"
                 >
                   Bekor qilish
                 </Button>
@@ -933,26 +971,113 @@ export function Dashboard() {
         </DialogContent>
       </Dialog>
 
-      {/* NEW BOOKING MODAL */}
-      <Dialog open={newBookingModalOpen} onOpenChange={setNewBookingModalOpen}>
-        <DialogContent className="max-w-xl overflow-hidden rounded-[32px] border border-white/10 bg-[#0a1020]/95 p-0 text-white shadow-[0_20px_80px_rgba(0,0,0,0.55)] backdrop-blur-2xl">
-          <div className="absolute inset-0 bg-gradient-to-br from-white/10 via-transparent to-transparent" />
+      {/* OCCUPIED ROOM MODAL */}
+      <Dialog open={occupiedModalOpen} onOpenChange={setOccupiedModalOpen}>
+        <DialogContent className="max-w-xl rounded-[32px] border border-slate-200 bg-white/95 p-0 text-slate-900 shadow-[0_20px_80px_rgba(15,23,42,0.18)] backdrop-blur-2xl dark:border-white/10 dark:bg-[#0a1020]/95 dark:text-white dark:shadow-[0_20px_80px_rgba(0,0,0,0.55)]">
+          <div className="absolute inset-0 bg-gradient-to-br from-white/50 via-transparent to-transparent dark:from-white/10 dark:via-transparent dark:to-transparent" />
           <div className="h-[2px] w-full bg-gradient-to-r from-fuchsia-400 via-violet-300 to-cyan-300" />
 
           <div className="relative p-6 sm:p-7">
             <DialogHeader>
-              <DialogTitle className="text-2xl font-bold text-white">
+              <DialogTitle className="text-2xl font-bold text-slate-900 dark:text-white">
+                {selectedRoom?.name}
+              </DialogTitle>
+              <DialogDescription className="text-slate-600 dark:text-slate-400">
+                Hozir xona band. Shu yerdan tugatish mumkin.
+              </DialogDescription>
+            </DialogHeader>
+
+            <div className="mt-6 space-y-5">
+              <div className="rounded-2xl border border-slate-200 bg-slate-50/70 p-4 text-sm text-slate-700 dark:border-white/10 dark:bg-white/[0.04] dark:text-slate-300">
+                <p>
+                  Qurilma turi:{" "}
+                  <span className="font-semibold text-slate-900 dark:text-white">
+                    {selectedRoom?.deviceLabel}
+                  </span>
+                </p>
+
+                {selectedRoom?.isVip ? (
+                  <>
+                    <p className="mt-2 font-semibold text-fuchsia-600 dark:text-fuchsia-300">
+                      VIP session
+                    </p>
+                    {selectedRoom.sessionStart && (
+                      <p className="mt-1">
+                        Boshlangan: {format(selectedRoom.sessionStart, "HH:mm")}
+                      </p>
+                    )}
+                  </>
+                ) : (
+                  <>
+                    {selectedRoom?.sessionStart && selectedRoom?.occupiedUntil && (
+                      <p className="mt-2">
+                        Vaqti: {format(selectedRoom.sessionStart, "HH:mm")} -{" "}
+                        {format(selectedRoom.occupiedUntil, "HH:mm")}
+                      </p>
+                    )}
+                    <p className="mt-1">
+                      Qolgan vaqt: {formatRemainingTime(selectedRoom?.occupiedUntil)}
+                    </p>
+                  </>
+                )}
+              </div>
+
+              <div className="flex flex-col gap-3 sm:flex-row sm:justify-end">
+                <Button
+                  type="button"
+                  variant="outline"
+                  onClick={() => setOccupiedModalOpen(false)}
+                  className="h-12 rounded-2xl border-slate-200 bg-white text-slate-700 hover:bg-slate-50 dark:border-white/10 dark:bg-white/5 dark:text-slate-200 dark:hover:bg-white/10"
+                >
+                  Ortga
+                </Button>
+                <Button
+                  type="button"
+                  onClick={handleFinishSession}
+                  className="h-12 rounded-2xl border border-red-400/20 bg-gradient-to-r from-rose-500 to-red-500 font-semibold text-white hover:from-rose-400 hover:to-red-400"
+                >
+                  Honani tugatish
+                </Button>
+              </div>
+            </div>
+          </div>
+        </DialogContent>
+      </Dialog>
+
+      {/* NEW BOOKING MODAL */}
+      <Dialog open={newBookingModalOpen} onOpenChange={setNewBookingModalOpen}>
+        <DialogContent className="max-w-xl rounded-[32px] border border-slate-200 bg-white/95 p-0 text-slate-900 shadow-[0_20px_80px_rgba(15,23,42,0.18)] backdrop-blur-2xl dark:border-white/10 dark:bg-[#0a1020]/95 dark:text-white dark:shadow-[0_20px_80px_rgba(0,0,0,0.55)]">
+          <div className="absolute inset-0 bg-gradient-to-br from-white/50 via-transparent to-transparent dark:from-white/10 dark:via-transparent dark:to-transparent" />
+          <div className="h-[2px] w-full bg-gradient-to-r from-fuchsia-400 via-violet-300 to-cyan-300" />
+
+          <div className="relative p-6 sm:p-7">
+            <DialogHeader>
+              <DialogTitle className="text-2xl font-bold text-slate-900 dark:text-white">
                 Yangi buyurtma qo‘shish
               </DialogTitle>
-              <DialogDescription className="text-slate-400">
-                Oldindan bron qilish uchun. Hali kelmagan bo‘lsa ham joyni
-                bandlab qo‘yadi.
+              <DialogDescription className="text-slate-600 dark:text-slate-400">
+                Oldindan bron qilish uchun ism va telefon ham yoziladi.
               </DialogDescription>
             </DialogHeader>
 
             <div className="mt-6 space-y-5">
               <div className="space-y-2">
-                <Label className="text-xs uppercase tracking-[0.18em] text-slate-200/80">
+                <Label className="text-xs uppercase tracking-[0.18em] text-slate-500 dark:text-slate-200/80">
+                  Ism
+                </Label>
+                <div className="relative">
+                  <User2 className="pointer-events-none absolute left-4 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-400" />
+                  <Input
+                    value={bookingClientName}
+                    onChange={(e) => setBookingClientName(e.target.value)}
+                    placeholder="Mijoz ismi"
+                    className="h-12 rounded-2xl border border-slate-200 bg-white/80 pl-11 text-slate-900 placeholder:text-slate-400 focus:border-fuchsia-400/60 focus:ring-2 focus:ring-fuchsia-400/20 dark:border-white/10 dark:bg-white/8 dark:text-slate-100 dark:placeholder:text-slate-400"
+                  />
+                </div>
+              </div>
+
+              <div className="space-y-2">
+                <Label className="text-xs uppercase tracking-[0.18em] text-slate-500 dark:text-slate-200/80">
                   Telefon raqami
                 </Label>
                 <div className="relative">
@@ -961,25 +1086,25 @@ export function Dashboard() {
                     value={bookingPhone}
                     onChange={(e) => setBookingPhone(e.target.value)}
                     placeholder="+966 5X XXX XX XX"
-                    className="h-12 rounded-2xl border border-white/10 bg-white/8 pl-11 text-slate-100 placeholder:text-slate-400 backdrop-blur-xl focus:border-fuchsia-400/60 focus:ring-2 focus:ring-fuchsia-400/20"
+                    className="h-12 rounded-2xl border border-slate-200 bg-white/80 pl-11 text-slate-900 placeholder:text-slate-400 focus:border-fuchsia-400/60 focus:ring-2 focus:ring-fuchsia-400/20 dark:border-white/10 dark:bg-white/8 dark:text-slate-100 dark:placeholder:text-slate-400"
                   />
                 </div>
               </div>
 
               <div className="space-y-2">
-                <Label className="text-xs uppercase tracking-[0.18em] text-slate-200/80">
+                <Label className="text-xs uppercase tracking-[0.18em] text-slate-500 dark:text-slate-200/80">
                   Xona
                 </Label>
                 <select
                   value={bookingRoomId}
                   onChange={(e) => setBookingRoomId(e.target.value)}
-                  className="h-12 w-full rounded-2xl border border-white/10 bg-white/8 px-4 text-slate-100 outline-none backdrop-blur-xl focus:border-cyan-400/60 focus:ring-2 focus:ring-cyan-400/20"
+                  className="h-12 w-full rounded-2xl border border-slate-200 bg-white/80 px-4 text-slate-900 outline-none focus:border-cyan-400/60 focus:ring-2 focus:ring-cyan-400/20 dark:border-white/10 dark:bg-white/8 dark:text-slate-100"
                 >
                   {freeOrBookedRooms.map((room) => (
                     <option
                       key={room.id}
                       value={room.id}
-                      className="bg-slate-900 text-white"
+                      className="bg-white text-slate-900 dark:bg-slate-900 dark:text-white"
                     >
                       {room.name} — {room.deviceLabel}
                     </option>
@@ -987,31 +1112,19 @@ export function Dashboard() {
                 </select>
               </div>
 
-              <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
-                <div className="space-y-2">
-                  <Label className="text-xs uppercase tracking-[0.18em] text-slate-200/80">
-                    Boshlanish vaqti
-                  </Label>
-                  <Input
-                    type="time"
-                    value={bookingStart}
-                    onChange={(e) => setBookingStart(e.target.value)}
-                    className="h-12 rounded-2xl border border-white/10 bg-white/8 text-slate-100 backdrop-blur-xl focus:border-cyan-400/60 focus:ring-2 focus:ring-cyan-400/20"
-                  />
-                </div>
-
-                <div className="flex items-end">
-                  <Button
-                    type="button"
-                    onClick={handleSetNowForBooking}
-                    className="h-12 w-full rounded-2xl border border-white/10 bg-white/8 text-slate-100 hover:bg-white/12"
-                  >
-                    Hozir
-                  </Button>
-                </div>
+              <div className="space-y-2">
+                <Label className="text-xs uppercase tracking-[0.18em] text-slate-500 dark:text-slate-200/80">
+                  Boshlanish vaqti
+                </Label>
+                <Input
+                  type="time"
+                  value={bookingStart}
+                  onChange={(e) => setBookingStart(e.target.value)}
+                  className="h-12 rounded-2xl border border-slate-200 bg-white/80 text-slate-900 focus:border-cyan-400/60 focus:ring-2 focus:ring-cyan-400/20 dark:border-white/10 dark:bg-white/8 dark:text-slate-100"
+                />
               </div>
 
-              <div className="flex items-center gap-3 rounded-2xl border border-white/10 bg-white/[0.05] p-4">
+              <div className="flex items-center gap-3 rounded-2xl border border-slate-200 bg-slate-50/70 p-4 dark:border-white/10 dark:bg-white/[0.05]">
                 <input
                   id="booking-vip"
                   type="checkbox"
@@ -1026,24 +1139,49 @@ export function Dashboard() {
 
               {!bookingVip && (
                 <div className="space-y-2">
-                  <Label className="text-xs uppercase tracking-[0.18em] text-slate-200/80">
-                    Tugash vaqti
+                  <Label className="text-xs uppercase tracking-[0.18em] text-slate-500 dark:text-slate-200/80">
+                    Davomiyligi
                   </Label>
-                  <Input
-                    type="time"
-                    value={bookingEnd}
-                    onChange={(e) => setBookingEnd(e.target.value)}
-                    className="h-12 rounded-2xl border border-white/10 bg-white/8 text-slate-100 backdrop-blur-xl focus:border-cyan-400/60 focus:ring-2 focus:ring-cyan-400/20"
-                  />
+
+                  <div className="grid grid-cols-2 gap-3 sm:grid-cols-5">
+                    {durationOptions.map((item) => {
+                      const isActive = bookingDuration === item.value;
+
+                      return (
+                        <button
+                          key={item.value}
+                          type="button"
+                          onClick={() => setBookingDuration(item.value)}
+                          className={[
+                            "rounded-2xl border px-3 py-3 text-sm font-medium transition-all",
+                            isActive
+                              ? "border-fuchsia-400/40 bg-gradient-to-r from-fuchsia-500/15 to-cyan-500/15 text-fuchsia-600 dark:text-fuchsia-200"
+                              : "border-slate-200 bg-white/70 text-slate-700 hover:bg-slate-50 dark:border-white/10 dark:bg-white/5 dark:text-slate-200 dark:hover:bg-white/10",
+                          ].join(" ")}
+                        >
+                          {item.label}
+                        </button>
+                      );
+                    })}
+                  </div>
                 </div>
               )}
+
+              <div className="rounded-2xl border border-slate-200 bg-slate-50/70 p-4 text-sm text-slate-700 dark:border-white/10 dark:bg-white/[0.04] dark:text-slate-300">
+                <p>
+                  Bron summasi:{" "}
+                  <span className="font-semibold text-slate-900 dark:text-white">
+                    {selectedBookingAmount}
+                  </span>
+                </p>
+              </div>
 
               <div className="flex flex-col gap-3 sm:flex-row sm:justify-end">
                 <Button
                   type="button"
                   variant="outline"
                   onClick={() => setNewBookingModalOpen(false)}
-                  className="h-12 rounded-2xl border-white/10 bg-white/5 text-slate-200 hover:bg-white/10"
+                  className="h-12 rounded-2xl border-slate-200 bg-white text-slate-700 hover:bg-slate-50 dark:border-white/10 dark:bg-white/5 dark:text-slate-200 dark:hover:bg-white/10"
                 >
                   Bekor qilish
                 </Button>
