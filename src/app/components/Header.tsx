@@ -45,7 +45,7 @@ export function Header() {
         <div className="absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-white/20 to-transparent" />
         <div className="absolute inset-x-0 bottom-0 h-px bg-gradient-to-r from-fuchsia-400/30 via-cyan-300/30 to-blue-400/30" />
 
-        <div className="relative flex h-full items-center justify-between gap-4 pl-[114px] pr-4 md:pr-6">
+        <div className="relative flex h-full items-center justify-between gap-4 pl-[120px] pr-4 md:pr-6">
           {/* Search area */}
           <div className="flex-1">
             <div className="max-w-[520px]">
