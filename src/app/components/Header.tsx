@@ -125,7 +125,7 @@ export function Header() {
         <div className="absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-slate-400/30 to-transparent dark:via-white/20" />
         <div className="absolute inset-x-0 bottom-0 h-px bg-gradient-to-r from-violet-400/30 via-cyan-400/20 to-blue-400/30 dark:from-fuchsia-400/30 dark:via-cyan-300/30 dark:to-blue-400/30" />
 
-        <div className="relative flex h-full ml-[100px] items-center justify-between gap-4 px-4 md:px-6">
+        <div className="relative flex h-full items-center justify-between gap-4 px-4 md:px-6">
           {/* Search */}
           <div className="min-w-0 flex-1">
             <div
